@@ -35,16 +35,41 @@ export default function Home() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   // Validation functions
+  // Format phone to +49 format
+  const formatPhoneNumber = (input: string): string => {
+    const digits = input.replace(/\D/g, "");
+
+    if (!digits) return "";
+
+    // If starts with 49 (international without +), add +
+    if (digits.startsWith("49")) {
+      return `+${digits}`;
+    }
+
+    // If starts with 0, replace with +49
+    if (digits.startsWith("0")) {
+      return `+49${digits.slice(1)}`;
+    }
+
+    // Otherwise assume it's +49
+    if (!input.startsWith("+")) {
+      return `+49${digits}`;
+    }
+
+    return `+${digits}`;
+  };
+
   const isPhoneValid = (tel: string) => {
     const digits = tel.replace(/\D/g, "");
-    // Germany: +49 (11-13 digits total), or 0 (10-11 digits total)
+    // Must be +49 format with 11-13 digits total
     if (tel.startsWith("+49")) {
       return digits.length >= 11 && digits.length <= 13;
     }
+    // Accept 0 format with 10-11 digits
     if (tel.startsWith("0")) {
       return digits.length >= 10 && digits.length <= 11;
     }
-    // Without prefix: at least 10 digits
+    // Accept raw digits (10-13)
     return digits.length >= 10 && digits.length <= 13;
   };
 
@@ -130,7 +155,7 @@ export default function Home() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submit
+  // Submit with reCAPTCHA
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -138,6 +163,12 @@ export default function Home() {
 
     setLoading(true);
     try {
+      // Get reCAPTCHA token
+      const token = await (window as any).grecaptcha.execute(
+        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+        { action: "submit" }
+      );
+
       const response = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -148,6 +179,7 @@ export default function Home() {
           schaetzung: sparText,
           src: new URLSearchParams(window.location.search).get("src") || "landingpage",
           consent: formState.consent,
+          recaptchaToken: token,
         }),
       });
 
@@ -157,6 +189,7 @@ export default function Home() {
         setErrors({ submit: "Fehler beim Absenden. Bitte versuchen Sie es später erneut." });
       }
     } catch (error) {
+      console.error("Submit error:", error);
       setErrors({ submit: "Verbindungsfehler. Bitte versuchen Sie es später erneut." });
     } finally {
       setLoading(false);
@@ -174,6 +207,13 @@ export default function Home() {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Load reCAPTCHA
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+    document.head.appendChild(script);
   }, []);
 
   return (
@@ -693,13 +733,17 @@ export default function Home() {
                   {touched.plz && isPlzValid_check && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ PLZ gültig</span>}
                 </label>
                 <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Telefon</span>
+                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Telefon (mit +49)</span>
                   <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                     <input
                       type="tel"
-                      placeholder="z. B. +49 123 456789 oder 0123 456789"
+                      inputMode="tel"
+                      placeholder="z. B. 0123 456789"
                       value={formState.tel}
-                      onChange={(e) => setFormState({ ...formState, tel: e.target.value })}
+                      onChange={(e) => {
+                        const formatted = formatPhoneNumber(e.target.value);
+                        setFormState({ ...formState, tel: formatted });
+                      }}
                       onFocus={(e) => {
                         e.currentTarget.style.borderColor = "#1C1233";
                         setTouched({ ...touched, tel: true });
@@ -712,7 +756,7 @@ export default function Home() {
                         borderRadius: "14px",
                         padding: "15px 16px",
                         paddingRight: "45px",
-                        fontSize: "18px",
+                        fontSize: "16px",
                         color: "#1C1233",
                         background: "#FFFFFF",
                         outline: "none",
@@ -727,8 +771,8 @@ export default function Home() {
                     )}
                   </div>
                   {errors.tel && <span style={{ fontSize: "14px", color: "#DB2C14" }}>{errors.tel}</span>}
-                  {touched.tel && isTelValid && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Deutsche Nummer erkannt</span>}
-                  {touched.tel && formState.tel && !isTelValid && !errors.tel && <span style={{ fontSize: "13px", color: "#FF9500", fontWeight: 600 }}>⚠ Nummer zu kurz oder ungültiges Format</span>}
+                  {touched.tel && isTelValid && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Als +49 Format gespeichert</span>}
+                  {touched.tel && formState.tel && !isTelValid && !errors.tel && <span style={{ fontSize: "13px", color: "#FF9500", fontWeight: 600 }}>⚠ Noch nicht vollständig</span>}
                 </label>
                 <label style={{ display: "flex", gap: "10px", alignItems: "flex-start", fontSize: "14px", color: "#4E4262", cursor: "pointer" }}>
                   <input
