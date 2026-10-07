@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   // Configuration (from DESIGN.md section C)
@@ -22,6 +22,7 @@ export default function Home() {
   const [gas, setGas] = useState(110);
   const [vers, setVers] = useState(600);
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
   const [formState, setFormState] = useState({
     name: "",
     plz: "",
@@ -168,6 +169,13 @@ export default function Home() {
     setErrors({});
   };
 
+  // Scroll listener für Floating Button
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div style={{ fontFamily: "var(--font-dm-sans)", color: "#1C1233", background: "#FFF7EA" }}>
       {/* B1. Banner */}
@@ -279,6 +287,21 @@ export default function Home() {
                 </span>
               </div>
             ))}
+          </div>
+          {/* CTA nach Probleme */}
+          <div style={{ marginTop: "40px", background: "#FFD60A", borderRadius: "28px", padding: "clamp(28px, 5vw, 52px)", textAlign: "center", display: "flex", flexDirection: "column", gap: "22px", alignItems: "center", transform: "rotate(-1deg)" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <span style={{ color: "#1C1233", fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Keine Ausreden mehr</span>
+              <h3 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.04em", color: "#1C1233" }}>
+                Jetzt kostenlos prüfen lassen
+              </h3>
+              <p style={{ margin: 0, color: "#1C1233", fontSize: "18px", fontWeight: 600, maxWidth: "500px", alignSelf: "center" }}>
+                5 Minuten, 0 € Kosten, bis zu 400 € im Jahr sparen
+              </p>
+            </div>
+            <a href="#start" style={{ background: "#1C1233", color: "#FFF7EA", borderRadius: "999px", padding: "18px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", transition: "all 0.2s", border: "none" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#3a3347")} onMouseLeave={(e) => (e.currentTarget.style.background = "#1C1233")}>
+              Platz sichern →
+            </a>
           </div>
         </div>
       </section>
@@ -545,6 +568,31 @@ export default function Home() {
         </div>
       </section>
 
+      {/* B10.5 Urgency CTA nach FAQ */}
+      <section style={{ background: "#DB2C14", color: "#FFFFFF", padding: "88px 24px" }}>
+        <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "32px", alignItems: "center", textAlign: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "16px", fontWeight: 700, color: "#FFD60A" }}>
+              <span>⏰ ZEIT LÄUFT AB</span>
+            </div>
+            <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(36px, 5vw, 64px)", letterSpacing: "-0.04em", lineHeight: "1.1" }}>
+              Nur noch {frei} Plätze im {CONFIG.monat}
+            </h2>
+            <p style={{ margin: 0, fontSize: "20px", fontWeight: 600, maxWidth: "600px", alignSelf: "center", color: "#FFE9D6" }}>
+              Preis-Wächter gratis nur bis <span style={{ background: "#FFD60A", color: "#DB2C14", padding: "0 8px", borderRadius: "6px", fontWeight: 800 }}>{CONFIG.frist}</span>
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
+            <a href="#start" style={{ background: "#FFD60A", color: "#DB2C14", borderRadius: "999px", padding: "20px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", transition: "all 0.2s", border: "none", textDecoration: "none" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#FFF7EA")} onMouseLeave={(e) => (e.currentTarget.style.background = "#FFD60A")}>
+              Letzter Platz sichern →
+            </a>
+            <a href="#rechner" style={{ background: "transparent", color: "#FFD60A", borderRadius: "999px", padding: "20px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", border: "2px solid #FFD60A", transition: "all 0.2s", textDecoration: "none" }} onMouseEnter={(e) => { e.currentTarget.style.background = "#FFD60A"; e.currentTarget.style.color = "#DB2C14"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#FFD60A"; }}>
+              Erst Ersparnis rechnen
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* B11. Formular */}
       <section id="start" style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "1fr", gap: "48px", alignItems: "center" }} className="grid-2-desktop">
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
@@ -748,6 +796,22 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* Floating Action Button */}
+      {scrollY > 400 && (
+        <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 999, animation: "slideIn 0.3s ease-out" }}>
+          <a href="#start" style={{ display: "flex", alignItems: "center", gap: "10px", background: "#DB2C14", color: "#FFFFFF", borderRadius: "999px", padding: "14px 20px", fontWeight: 800, fontSize: "14px", boxShadow: "0 8px 24px rgba(219, 44, 20, 0.4)", cursor: "pointer", transition: "all 0.2s", textDecoration: "none" }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "#B8230F"; (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 32px rgba(219, 44, 20, 0.6)"; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#DB2C14"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(219, 44, 20, 0.4)"; }}>
+            <span>✓ {frei} Plätze frei</span>
+            <span style={{ fontSize: "16px" }}>→</span>
+          </a>
+          <style>{`
+            @keyframes slideIn {
+              from { opacity: 0; transform: translateY(20px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          `}</style>
+        </div>
+      )}
 
       {/* B12. Footer */}
       <footer style={{ background: "#1C1233", color: "#D8D0E4", padding: "32px 24px" }}>

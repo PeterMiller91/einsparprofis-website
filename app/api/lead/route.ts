@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GoogleSpreadsheet } from "google-spreadsheet";
+import { JWT } from "google-auth-library";
 
 async function sendToTelegram(leadData: {
   name: string;
@@ -49,6 +51,53 @@ async function sendToTelegram(leadData: {
     return await response.json();
   } catch (error) {
     console.error("Telegram notification error:", error);
+    throw error;
+  }
+}
+
+async function sendToGoogleSheets(leadData: {
+  name: string;
+  plz: string;
+  tel: string;
+  schaetzung?: string;
+  src?: string;
+  timestamp: string;
+}) {
+  const credentialsJson = process.env.GOOGLE_SHEETS_CREDENTIALS;
+  const sheetId = process.env.GOOGLE_SHEETS_ID;
+
+  if (!credentialsJson || !sheetId) {
+    console.warn(
+      "Google Sheets credentials missing. Skipping Google Sheets. Set GOOGLE_SHEETS_CREDENTIALS and GOOGLE_SHEETS_ID in environment variables."
+    );
+    return null;
+  }
+
+  try {
+    const credentials = JSON.parse(credentialsJson);
+
+    const doc = new GoogleSpreadsheet(sheetId, new JWT({
+      email: credentials.client_email,
+      key: credentials.private_key,
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    }));
+
+    await doc.loadInfo();
+    const sheet = doc.sheetsByIndex[0];
+
+    await sheet.addRow({
+      Name: leadData.name,
+      PLZ: leadData.plz,
+      Telefon: leadData.tel,
+      Schätzung: leadData.schaetzung || "Nicht angegeben",
+      Quelle: leadData.src || "Website",
+      Zeitstempel: new Date(leadData.timestamp).toLocaleString("de-DE"),
+    });
+
+    console.log("Lead successfully added to Google Sheets");
+    return true;
+  } catch (error) {
+    console.error("Google Sheets error:", error);
     throw error;
   }
 }
@@ -118,6 +167,14 @@ export async function POST(request: NextRequest) {
     } catch (telegramError) {
       console.error("Failed to send to Telegram:", telegramError);
       // Lead is still received, but log the Telegram notification error
+    }
+
+    try {
+      await sendToGoogleSheets(leadData);
+      console.log("Lead successfully added to Google Sheets");
+    } catch (sheetsError) {
+      console.error("Failed to add to Google Sheets:", sheetsError);
+      // Lead is still received, but log the Google Sheets error
     }
 
     return NextResponse.json(
