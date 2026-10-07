@@ -31,6 +31,10 @@ export default function Home() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const isPhoneValid = (tel: string) => /^\d{6,}/.test(tel.replace(/\D/g, ""));
+  const isTelValid = touched.tel && formState.tel && isPhoneValid(formState.tel);
 
   // Calculations (DESIGN.md section C, line 357)
   const eur = (n: number) => n.toLocaleString("de-DE") + " €";
@@ -586,25 +590,40 @@ export default function Home() {
                 </label>
                 <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Telefon</span>
-                  <input
-                    type="tel"
-                    placeholder="für den Rückruf"
-                    value={formState.tel}
-                    onChange={(e) => setFormState({ ...formState, tel: e.target.value })}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1233")}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = "#E6D9C4")}
-                    style={{
-                      border: "2px solid #E6D9C4",
-                      borderRadius: "14px",
-                      padding: "15px 16px",
-                      fontSize: "18px",
-                      color: "#1C1233",
-                      background: "#FFFFFF",
-                      outline: "none",
-                      transition: "border-color 0.2s",
-                    }}
-                  />
+                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                    <input
+                      type="tel"
+                      placeholder="für den Rückruf"
+                      value={formState.tel}
+                      onChange={(e) => setFormState({ ...formState, tel: e.target.value })}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#1C1233";
+                        setTouched({ ...touched, tel: true });
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = isTelValid ? "#2ECC71" : "#E6D9C4";
+                      }}
+                      style={{
+                        border: "2px solid " + (isTelValid ? "#2ECC71" : errors.tel ? "#DB2C14" : "#E6D9C4"),
+                        borderRadius: "14px",
+                        padding: "15px 16px",
+                        paddingRight: "45px",
+                        fontSize: "18px",
+                        color: "#1C1233",
+                        background: "#FFFFFF",
+                        outline: "none",
+                        transition: "border-color 0.2s",
+                        width: "100%",
+                      }}
+                    />
+                    {touched.tel && formState.tel && (
+                      <span style={{ position: "absolute", right: "16px", fontSize: "18px" }}>
+                        {isTelValid ? "✓" : "✗"}
+                      </span>
+                    )}
+                  </div>
                   {errors.tel && <span style={{ fontSize: "14px", color: "#DB2C14" }}>{errors.tel}</span>}
+                  {touched.tel && isTelValid && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Telefonnummer gültig</span>}
                 </label>
                 <label style={{ display: "flex", gap: "10px", alignItems: "flex-start", fontSize: "14px", color: "#4E4262", cursor: "pointer" }}>
                   <input
