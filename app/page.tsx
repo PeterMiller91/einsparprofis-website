@@ -195,7 +195,7 @@ export default function Home() {
       </header>
 
       {/* B3. Hero */}
-      <section style={{ maxWidth: "1240px", margin: "0 auto", padding: "40px 24px 80px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 460px), 1fr))", gap: "56px", alignItems: "center" }}>
+      <section style={{ maxWidth: "1240px", margin: "0 auto", padding: "40px 24px 80px", display: "grid", gridTemplateColumns: "1fr", gap: "56px", alignItems: "center" }} className="grid-2-desktop">
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           <span style={{ alignSelf: "flex-start", fontSize: "14px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", border: "2px solid #1C1233", borderRadius: "999px", padding: "7px 14px" }}>Der 400-€-Haushalts-Check</span>
           <h1 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(46px, 6.4vw, 88px)", lineHeight: "0.98", letterSpacing: "-0.045em", textWrap: "balance" }}>
@@ -284,7 +284,7 @@ export default function Home() {
       </section>
 
       {/* B5. Spar-Rechner */}
-      <section id="rechner" style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: "48px", alignItems: "center" }}>
+      <section id="rechner" style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "1fr", gap: "48px", alignItems: "center" }} className="grid-2-desktop">
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#DB2C14" }}>Spar-Rechner</span>
           <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(36px, 4.6vw, 60px)", letterSpacing: "-0.04em", lineHeight: "1.02" }}>
@@ -359,7 +359,7 @@ export default function Home() {
       </section>
 
       {/* B6. Wertstapel */}
-      <section id="angebot" style={{ background: "#FFE9D6", padding: "96px 24px" }}>
+      <section id="angebot" style={{ background: "#FFE9D6", padding: "96px 24px", width: "100%", overflowX: "hidden" }}>
         <div style={{ maxWidth: "1000px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "36px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px", textAlign: "center", alignItems: "center" }}>
             <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#DB2C14" }}>Das ist alles drin</span>
@@ -402,7 +402,7 @@ export default function Home() {
       </section>
 
       {/* B7. Garantie */}
-      <section id="garantie" style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: "40px", alignItems: "center" }}>
+      <section id="garantie" style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "1fr", gap: "40px", alignItems: "center" }} className="grid-2-desktop">
         <div style={{ background: "#FFD60A", borderRadius: "32px", padding: "clamp(28px, 4vw, 48px)", display: "flex", flexDirection: "column", gap: "16px", transform: "rotate(-1.5deg)" }}>
           <div style={{ border: "3px dashed #1C1233", borderRadius: "22px", background: "#FFF7EA", padding: "24px", display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", textAlign: "center" }}>
             <span style={{ fontSize: "14px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase" }}>Gutschein aufs Haus</span>
@@ -476,7 +476,7 @@ export default function Home() {
       </section>
 
       {/* B9. Plätze & Bonus */}
-      <section style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: "24px" }}>
+      <section style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "1fr", gap: "24px" }} className="grid-2-desktop">
         <div style={{ background: "#FFFFFF", borderRadius: "28px", padding: "36px", display: "flex", flexDirection: "column", gap: "18px", boxShadow: "inset 0 0 0 2px #F0E2CC" }}>
           <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#DB2C14" }}>Begrenzte Plätze</span>
           <span style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(30px, 3.4vw, 42px)", letterSpacing: "-0.03em", lineHeight: "1.05" }}>
@@ -509,7 +509,7 @@ export default function Home() {
 
       {/* B10. FAQ */}
       <section id="faq" style={{ background: "#FFE9D6", padding: "96px 24px" }}>
-        <div style={{ maxWidth: "1240px", margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 380px), 1fr))", gap: "48px", alignItems: "start" }}>
+        <div style={{ maxWidth: "1240px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr", gap: "48px", alignItems: "start" }} className="grid-2-desktop">
           <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(40px, 5vw, 64px)", letterSpacing: "-0.04em", lineHeight: "1" }}>
             Wo ist der{" "}
             <span style={{ display: "inline-block", background: "#DB2C14", color: "#FFFFFF", padding: "0 14px 6px", borderRadius: "14px", transform: "rotate(-3deg)" }}>
@@ -546,7 +546,7 @@ export default function Home() {
       </section>
 
       {/* B11. Formular */}
-      <section id="start" style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))", gap: "48px", alignItems: "center" }}>
+      <section id="start" style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "1fr", gap: "48px", alignItems: "center" }} className="grid-2-desktop">
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(40px, 5.2vw, 72px)", letterSpacing: "-0.045em", lineHeight: "0.98" }}>
             Sichern Sie sich{" "}

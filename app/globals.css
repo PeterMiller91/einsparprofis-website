@@ -56,3 +56,85 @@ input[type="range"] {
 input {
   font: inherit;
 }
+
+/* Responsive Grid Classes */
+.grid-2-desktop {
+  grid-template-columns: 1fr !important;
+}
+
+.grid-2-desktop-v2 {
+  grid-template-columns: 1fr !important;
+}
+
+@media (min-width: 768px) {
+  .grid-2-desktop {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .grid-2-desktop-v2 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* Mobile Responsive Fixes */
+@media (max-width: 640px) {
+  /* Labels with space-between need to stack on mobile */
+  label span[style*="space-between"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  /* Ensure no text overflow */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Range sliders should be full width */
+  input[type="range"] {
+    max-width: 100%;
+  }
+
+  /* Ensure cards don't overflow */
+  div[style*="boxShadow"] {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small devices */
+  section {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Ensure label text wraps properly */
+  label span {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Stack all flex items on mobile */
+  div[style*="flexDirection"] {
+    gap: 12px !important;
+  }
+
+  /* Reduce padding on cards */
+  div[style*="borderRadius: \"28px\""],
+  div[style*="borderRadius: \"24px\""] {
+    padding: 20px 16px !important;
+  }
+
+  /* Make text sizes smaller on mobile */
+  h1, h2, h3 {
+    font-size: clamp(24px, 6vw, 48px) !important;
+  }
+
+  /* Ensure inputs are fully visible */
+  input[type="text"],
+  input[type="tel"],
+  input[type="range"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
