@@ -155,7 +155,7 @@ export default function Home() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Submit with reCAPTCHA
+  // Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -163,12 +163,6 @@ export default function Home() {
 
     setLoading(true);
     try {
-      // Get reCAPTCHA token
-      const token = await (window as any).grecaptcha.execute(
-        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
-        { action: "submit" }
-      );
-
       const response = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -179,7 +173,6 @@ export default function Home() {
           schaetzung: sparText,
           src: new URLSearchParams(window.location.search).get("src") || "landingpage",
           consent: formState.consent,
-          recaptchaToken: token,
         }),
       });
 
@@ -189,7 +182,6 @@ export default function Home() {
         setErrors({ submit: "Fehler beim Absenden. Bitte versuchen Sie es später erneut." });
       }
     } catch (error) {
-      console.error("Submit error:", error);
       setErrors({ submit: "Verbindungsfehler. Bitte versuchen Sie es später erneut." });
     } finally {
       setLoading(false);
@@ -207,13 +199,6 @@ export default function Home() {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Load reCAPTCHA
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
-    document.head.appendChild(script);
   }, []);
 
   return (

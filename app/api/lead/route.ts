@@ -102,47 +102,11 @@ async function sendToGoogleSheets(leadData: {
   }
 }
 
-async function verifyRecaptcha(token: string): Promise<boolean> {
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-
-  if (!secretKey) {
-    console.warn("reCAPTCHA secret key missing. Skipping verification.");
-    return true;
-  }
-
-  try {
-    const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `secret=${secretKey}&response=${token}`,
-    });
-
-    const data = await response.json();
-    // Accept score > 0.3 (adjust as needed)
-    return data.success && data.score > 0.3;
-  } catch (error) {
-    console.error("reCAPTCHA verification error:", error);
-    return false;
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const { name, plz, tel, schaetzung, src, consent, recaptchaToken } = body;
-
-    // Verify reCAPTCHA
-    if (recaptchaToken) {
-      const isValidCaptcha = await verifyRecaptcha(recaptchaToken);
-      if (!isValidCaptcha) {
-        console.warn("reCAPTCHA verification failed");
-        return NextResponse.json(
-          { error: "reCAPTCHA Überprüfung fehlgeschlagen. Bitte versuchen Sie es erneut." },
-          { status: 400 }
-        );
-      }
-    }
+    const { name, plz, tel, schaetzung, src, consent } = body;
 
     // Validation
     if (!name || !plz || !tel || !consent) {
