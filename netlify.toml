@@ -1,0 +1,19 @@
+[build]
+command = "npm run build"
+functions = "api"
+publish = ".next"
+
+[functions]
+node_bundler = "esbuild"
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/:splat"
+status = 200
+
+[[headers]]
+for = "/api/*"
+[headers.values]
+"Access-Control-Allow-Origin" = "*"
+"Access-Control-Allow-Methods" = "GET, POST, PUT, DELETE, OPTIONS"
+"Access-Control-Allow-Headers" = "Content-Type"
