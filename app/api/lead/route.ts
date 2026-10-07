@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-async function sendToAirtable(leadData: {
+async function sendToTelegram(leadData: {
   name: string;
   plz: string;
   tel: string;
@@ -8,50 +8,47 @@ async function sendToAirtable(leadData: {
   src?: string;
   timestamp: string;
 }) {
-  const airtableToken = process.env.AIRTABLE_API_TOKEN;
-  const airtableBaseId = process.env.AIRTABLE_BASE_ID;
-  const airtableTableName = process.env.AIRTABLE_TABLE_NAME || "Leads";
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
 
-  if (!airtableToken || !airtableBaseId) {
+  if (!botToken || !chatId) {
     console.warn(
-      "Airtable credentials missing. Skipping Airtable sync. Set AIRTABLE_API_TOKEN and AIRTABLE_BASE_ID in environment variables."
+      "Telegram credentials missing. Skipping Telegram notification. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in environment variables."
     );
     return null;
   }
 
   try {
-    const response = await fetch(
-      `https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${airtableToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          records: [
-            {
-              fields: {
-                Name: leadData.name,
-                PLZ: leadData.plz,
-                Telefon: leadData.tel,
-                Schätzung: leadData.schaetzung || null,
-                Quelle: leadData.src || "Website",
-                "Datum/Uhrzeit": leadData.timestamp,
-              },
-            },
-          ],
-        }),
-      }
-    );
+    const message = `
+🎯 <b>Neuer Lead!</b>
+
+👤 <b>Name:</b> ${leadData.name}
+📍 <b>PLZ:</b> ${leadData.plz}
+📞 <b>Telefon:</b> ${leadData.tel}
+💰 <b>Schätzung:</b> ${leadData.schaetzung || "Nicht angegeben"}
+📊 <b>Quelle:</b> ${leadData.src || "Website"}
+⏰ <b>Zeit:</b> ${new Date(leadData.timestamp).toLocaleString("de-DE")}
+    `.trim();
+
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: "HTML",
+      }),
+    });
 
     if (!response.ok) {
-      throw new Error(`Airtable API error: ${response.statusText}`);
+      throw new Error(`Telegram API error: ${response.statusText}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Airtable sync error:", error);
+    console.error("Telegram notification error:", error);
     throw error;
   }
 }
@@ -96,11 +93,11 @@ export async function POST(request: NextRequest) {
     console.log("New lead received:", leadData);
 
     try {
-      await sendToAirtable(leadData);
-      console.log("Lead successfully sent to Airtable");
-    } catch (airtableError) {
-      console.error("Failed to send to Airtable:", airtableError);
-      // Lead is still saved, but log the Airtable error
+      await sendToTelegram(leadData);
+      console.log("Lead successfully sent to Telegram");
+    } catch (telegramError) {
+      console.error("Failed to send to Telegram:", telegramError);
+      // Lead is still received, but log the Telegram notification error
     }
 
     return NextResponse.json(
