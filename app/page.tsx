@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Home() {
   // Configuration (from DESIGN.md section C)
@@ -22,7 +22,6 @@ export default function Home() {
   const [gas, setGas] = useState(110);
   const [vers, setVers] = useState(600);
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
-  const [scrollY, setScrollY] = useState(0);
   const [formState, setFormState] = useState({
     name: "",
     plz: "",
@@ -194,12 +193,6 @@ export default function Home() {
     setErrors({});
   };
 
-  // Scroll listener für Floating Button
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <div style={{ fontFamily: "var(--font-dm-sans)", color: "#1C1233", background: "#FFF7EA" }}>
@@ -825,22 +818,6 @@ export default function Home() {
           )}
         </div>
       </section>
-
-      {/* Floating Action Button */}
-      {scrollY > 400 && (
-        <div style={{ position: "fixed", bottom: "20px", right: "20px", zIndex: 999, animation: "slideIn 0.3s ease-out" }}>
-          <a href="#start" style={{ display: "flex", alignItems: "center", gap: "10px", background: "#DB2C14", color: "#FFFFFF", borderRadius: "999px", padding: "14px 20px", fontWeight: 800, fontSize: "14px", boxShadow: "0 8px 24px rgba(219, 44, 20, 0.4)", cursor: "pointer", transition: "all 0.2s", textDecoration: "none" }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "#B8230F"; (e.currentTarget as HTMLElement).style.boxShadow = "0 12px 32px rgba(219, 44, 20, 0.6)"; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "#DB2C14"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 24px rgba(219, 44, 20, 0.4)"; }}>
-            <span>✓ {frei} Plätze frei</span>
-            <span style={{ fontSize: "16px" }}>→</span>
-          </a>
-          <style>{`
-            @keyframes slideIn {
-              from { opacity: 0; transform: translateY(20px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-          `}</style>
-        </div>
-      )}
 
       {/* B12. Footer */}
       <footer style={{ background: "#1C1233", color: "#D8D0E4", padding: "32px 24px" }}>
