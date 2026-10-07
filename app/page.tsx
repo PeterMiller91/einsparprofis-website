@@ -33,8 +33,33 @@ export default function Home() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const isPhoneValid = (tel: string) => /^\d{6,}/.test(tel.replace(/\D/g, ""));
+  // Validation functions
+  const isPhoneValid = (tel: string) => {
+    const digits = tel.replace(/\D/g, "");
+    // Germany: +49 (11-13 digits total), or 0 (10-11 digits total)
+    if (tel.startsWith("+49")) {
+      return digits.length >= 11 && digits.length <= 13;
+    }
+    if (tel.startsWith("0")) {
+      return digits.length >= 10 && digits.length <= 11;
+    }
+    // Without prefix: at least 10 digits
+    return digits.length >= 10 && digits.length <= 13;
+  };
+
+  const isPlzValid = (plz: string) => {
+    // Germany PLZ: 5 digits, doesn't start with 0
+    return /^[1-9]\d{4}$/.test(plz);
+  };
+
+  const isNameValid = (name: string) => {
+    // At least 2 characters, only letters, spaces, hyphens, umlauts
+    return /^[a-zA-ZäöüßÄÖÜ\s\-]{2,}$/.test(name.trim());
+  };
+
   const isTelValid = touched.tel && formState.tel && isPhoneValid(formState.tel);
+  const isPlzValid_check = touched.plz && formState.plz && isPlzValid(formState.plz);
+  const isNameValid_check = touched.name && formState.name && isNameValid(formState.name);
 
   // Calculations (DESIGN.md section C, line 357)
   const eur = (n: number) => n.toLocaleString("de-DE") + " €";
@@ -546,54 +571,85 @@ export default function Home() {
               <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Vorname</span>
-                  <input
-                    type="text"
-                    placeholder="z. B. Anna"
-                    value={formState.name}
-                    onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1233")}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = "#E6D9C4")}
-                    style={{
-                      border: "2px solid #E6D9C4",
-                      borderRadius: "14px",
-                      padding: "15px 16px",
-                      fontSize: "18px",
-                      color: "#1C1233",
-                      background: "#FFFFFF",
-                      outline: "none",
-                      transition: "border-color 0.2s",
-                    }}
-                  />
+                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                    <input
+                      type="text"
+                      placeholder="z. B. Anna"
+                      value={formState.name}
+                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#1C1233";
+                        setTouched({ ...touched, name: true });
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = isNameValid_check ? "#2ECC71" : "#E6D9C4";
+                      }}
+                      style={{
+                        border: "2px solid " + (isNameValid_check ? "#2ECC71" : errors.name ? "#DB2C14" : "#E6D9C4"),
+                        borderRadius: "14px",
+                        padding: "15px 16px",
+                        paddingRight: "45px",
+                        fontSize: "18px",
+                        color: "#1C1233",
+                        background: "#FFFFFF",
+                        outline: "none",
+                        transition: "border-color 0.2s",
+                        width: "100%",
+                      }}
+                    />
+                    {touched.name && formState.name && (
+                      <span style={{ position: "absolute", right: "16px", fontSize: "18px", color: isNameValid_check ? "#2ECC71" : "#DB2C14" }}>
+                        {isNameValid_check ? "✓" : "✗"}
+                      </span>
+                    )}
+                  </div>
                   {errors.name && <span style={{ fontSize: "14px", color: "#DB2C14" }}>{errors.name}</span>}
+                  {touched.name && isNameValid_check && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Name gültig</span>}
                 </label>
                 <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Postleitzahl</span>
-                  <input
-                    type="text"
-                    placeholder="z. B. 10115"
-                    value={formState.plz}
-                    onChange={(e) => setFormState({ ...formState, plz: e.target.value })}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = "#1C1233")}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = "#E6D9C4")}
-                    style={{
-                      border: "2px solid #E6D9C4",
-                      borderRadius: "14px",
-                      padding: "15px 16px",
-                      fontSize: "18px",
-                      color: "#1C1233",
-                      background: "#FFFFFF",
-                      outline: "none",
-                      transition: "border-color 0.2s",
-                    }}
-                  />
+                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                    <input
+                      type="text"
+                      placeholder="z. B. 10115"
+                      value={formState.plz}
+                      onChange={(e) => setFormState({ ...formState, plz: e.target.value })}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#1C1233";
+                        setTouched({ ...touched, plz: true });
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = isPlzValid_check ? "#2ECC71" : "#E6D9C4";
+                      }}
+                      maxLength={5}
+                      style={{
+                        border: "2px solid " + (isPlzValid_check ? "#2ECC71" : errors.plz ? "#DB2C14" : "#E6D9C4"),
+                        borderRadius: "14px",
+                        padding: "15px 16px",
+                        paddingRight: "45px",
+                        fontSize: "18px",
+                        color: "#1C1233",
+                        background: "#FFFFFF",
+                        outline: "none",
+                        transition: "border-color 0.2s",
+                        width: "100%",
+                      }}
+                    />
+                    {touched.plz && formState.plz && (
+                      <span style={{ position: "absolute", right: "16px", fontSize: "18px", color: isPlzValid_check ? "#2ECC71" : "#DB2C14" }}>
+                        {isPlzValid_check ? "✓" : "✗"}
+                      </span>
+                    )}
+                  </div>
                   {errors.plz && <span style={{ fontSize: "14px", color: "#DB2C14" }}>{errors.plz}</span>}
+                  {touched.plz && isPlzValid_check && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ PLZ gültig</span>}
                 </label>
                 <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Telefon</span>
                   <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
                     <input
                       type="tel"
-                      placeholder="für den Rückruf"
+                      placeholder="z. B. +49 123 456789 oder 0123 456789"
                       value={formState.tel}
                       onChange={(e) => setFormState({ ...formState, tel: e.target.value })}
                       onFocus={(e) => {
@@ -617,13 +673,14 @@ export default function Home() {
                       }}
                     />
                     {touched.tel && formState.tel && (
-                      <span style={{ position: "absolute", right: "16px", fontSize: "18px" }}>
+                      <span style={{ position: "absolute", right: "16px", fontSize: "18px", color: isTelValid ? "#2ECC71" : "#DB2C14" }}>
                         {isTelValid ? "✓" : "✗"}
                       </span>
                     )}
                   </div>
                   {errors.tel && <span style={{ fontSize: "14px", color: "#DB2C14" }}>{errors.tel}</span>}
-                  {touched.tel && isTelValid && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Telefonnummer gültig</span>}
+                  {touched.tel && isTelValid && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Deutsche Nummer erkannt</span>}
+                  {touched.tel && formState.tel && !isTelValid && !errors.tel && <span style={{ fontSize: "13px", color: "#FF9500", fontWeight: 600 }}>⚠ Nummer zu kurz oder ungültiges Format</span>}
                 </label>
                 <label style={{ display: "flex", gap: "10px", alignItems: "flex-start", fontSize: "14px", color: "#4E4262", cursor: "pointer" }}>
                   <input

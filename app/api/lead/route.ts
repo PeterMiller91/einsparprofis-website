@@ -67,16 +67,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!/^\d{5}$/.test(plz)) {
+    // PLZ validation: 5 digits, doesn't start with 0
+    if (!/^[1-9]\d{4}$/.test(plz)) {
       return NextResponse.json(
-        { error: "PLZ ungültig" },
+        { error: "PLZ ungültig (5 Ziffern, erste Ziffer nicht 0)" },
         { status: 400 }
       );
     }
 
-    if (!/^\d{6,}/.test(tel.replace(/\D/g, ""))) {
+    // Phone validation: German format
+    const digits = tel.replace(/\D/g, "");
+    let isValidPhone = false;
+    if (tel.startsWith("+49")) {
+      isValidPhone = digits.length >= 11 && digits.length <= 13;
+    } else if (tel.startsWith("0")) {
+      isValidPhone = digits.length >= 10 && digits.length <= 11;
+    } else {
+      isValidPhone = digits.length >= 10 && digits.length <= 13;
+    }
+
+    if (!isValidPhone) {
       return NextResponse.json(
-        { error: "Telefon ungültig" },
+        { error: "Telefon ungültig (deutsche Nummer erforderlich)" },
+        { status: 400 }
+      );
+    }
+
+    // Name validation: at least 2 characters, letters only
+    if (!/^[a-zA-ZäöüßÄÖÜ\s\-]{2,}$/.test(name.trim())) {
+      return NextResponse.json(
+        { error: "Name ungültig (mind. 2 Buchstaben)" },
         { status: 400 }
       );
     }
