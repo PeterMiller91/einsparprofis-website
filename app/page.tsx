@@ -23,7 +23,8 @@ export default function Home() {
   const [vers, setVers] = useState(600);
   const [openFaqIndex, setOpenFaqIndex] = useState(0);
   const [formState, setFormState] = useState({
-    name: "",
+    vorname: "",
+    nachname: "",
     plz: "",
     tel: "",
     consent: false,
@@ -84,7 +85,8 @@ export default function Home() {
 
   const isTelValid = touched.tel && formState.tel && isPhoneValid(formState.tel);
   const isPlzValid_check = touched.plz && formState.plz && isPlzValid(formState.plz);
-  const isNameValid_check = touched.name && formState.name && isNameValid(formState.name);
+  const isVornameValid_check = touched.vorname && formState.vorname && isNameValid(formState.vorname);
+  const isNachnameValid_check = touched.nachname && formState.nachname && isNameValid(formState.nachname);
 
   // Calculations (DESIGN.md section C, line 357)
   const eur = (n: number) => n.toLocaleString("de-DE") + " €";
@@ -134,8 +136,12 @@ export default function Home() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formState.name.trim()) {
-      newErrors.name = "Vorname erforderlich";
+    if (!formState.vorname.trim()) {
+      newErrors.vorname = "Vorname erforderlich";
+    }
+
+    if (!formState.nachname.trim()) {
+      newErrors.nachname = "Nachname erforderlich";
     }
 
     if (!/^\d{5}$/.test(formState.plz)) {
@@ -166,7 +172,8 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formState.name,
+          vorname: formState.vorname,
+          nachname: formState.nachname,
           plz: formState.plz,
           tel: formState.tel,
           schaetzung: sparText,
@@ -189,7 +196,7 @@ export default function Home() {
 
   const handleReset = () => {
     setSent(false);
-    setFormState({ name: "", plz: "", tel: "", consent: false });
+    setFormState({ vorname: "", nachname: "", plz: "", tel: "", consent: false });
     setErrors({});
   };
 
@@ -635,43 +642,82 @@ export default function Home() {
                 Ergebnis in 24 Stunden
               </span>
               <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Vorname</span>
-                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                    <input
-                      type="text"
-                      placeholder="z. B. Anna"
-                      value={formState.name}
-                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#1C1233";
-                        setTouched({ ...touched, name: true });
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = isNameValid_check ? "#2ECC71" : "#E6D9C4";
-                      }}
-                      style={{
-                        border: "2px solid " + (isNameValid_check ? "#2ECC71" : errors.name ? "#DB2C14" : "#E6D9C4"),
-                        borderRadius: "14px",
-                        padding: "15px 16px",
-                        paddingRight: "45px",
-                        fontSize: "18px",
-                        color: "#1C1233",
-                        background: "#FFFFFF",
-                        outline: "none",
-                        transition: "border-color 0.2s",
-                        width: "100%",
-                      }}
-                    />
-                    {touched.name && formState.name && (
-                      <span style={{ position: "absolute", right: "16px", fontSize: "18px", color: isNameValid_check ? "#2ECC71" : "#DB2C14" }}>
-                        {isNameValid_check ? "✓" : "✗"}
-                      </span>
-                    )}
-                  </div>
-                  {errors.name && <span style={{ fontSize: "14px", color: "#DB2C14" }}>{errors.name}</span>}
-                  {touched.name && isNameValid_check && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Name gültig</span>}
-                </label>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Vorname</span>
+                    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                      <input
+                        type="text"
+                        placeholder="z. B. Anna"
+                        value={formState.vorname}
+                        onChange={(e) => setFormState({ ...formState, vorname: e.target.value })}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = "#1C1233";
+                          setTouched({ ...touched, vorname: true });
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = isVornameValid_check ? "#2ECC71" : "#E6D9C4";
+                        }}
+                        style={{
+                          border: "2px solid " + (isVornameValid_check ? "#2ECC71" : errors.vorname ? "#DB2C14" : "#E6D9C4"),
+                          borderRadius: "14px",
+                          padding: "15px 16px",
+                          paddingRight: "45px",
+                          fontSize: "18px",
+                          color: "#1C1233",
+                          background: "#FFFFFF",
+                          outline: "none",
+                          transition: "border-color 0.2s",
+                          width: "100%",
+                        }}
+                      />
+                      {touched.vorname && formState.vorname && (
+                        <span style={{ position: "absolute", right: "16px", fontSize: "18px", color: isVornameValid_check ? "#2ECC71" : "#DB2C14" }}>
+                          {isVornameValid_check ? "✓" : "✗"}
+                        </span>
+                      )}
+                    </div>
+                    {errors.vorname && <span style={{ fontSize: "14px", color: "#DB2C14" }}>{errors.vorname}</span>}
+                    {touched.vorname && isVornameValid_check && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Gültig</span>}
+                  </label>
+                  <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Nachname</span>
+                    <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                      <input
+                        type="text"
+                        placeholder="z. B. Müller"
+                        value={formState.nachname}
+                        onChange={(e) => setFormState({ ...formState, nachname: e.target.value })}
+                        onFocus={(e) => {
+                          e.currentTarget.style.borderColor = "#1C1233";
+                          setTouched({ ...touched, nachname: true });
+                        }}
+                        onBlur={(e) => {
+                          e.currentTarget.style.borderColor = isNachnameValid_check ? "#2ECC71" : "#E6D9C4";
+                        }}
+                        style={{
+                          border: "2px solid " + (isNachnameValid_check ? "#2ECC71" : errors.nachname ? "#DB2C14" : "#E6D9C4"),
+                          borderRadius: "14px",
+                          padding: "15px 16px",
+                          paddingRight: "45px",
+                          fontSize: "18px",
+                          color: "#1C1233",
+                          background: "#FFFFFF",
+                          outline: "none",
+                          transition: "border-color 0.2s",
+                          width: "100%",
+                        }}
+                      />
+                      {touched.nachname && formState.nachname && (
+                        <span style={{ position: "absolute", right: "16px", fontSize: "18px", color: isNachnameValid_check ? "#2ECC71" : "#DB2C14" }}>
+                          {isNachnameValid_check ? "✓" : "✗"}
+                        </span>
+                      )}
+                    </div>
+                    {errors.nachname && <span style={{ fontSize: "14px", color: "#DB2C14" }}>{errors.nachname}</span>}
+                    {touched.nachname && isNachnameValid_check && <span style={{ fontSize: "13px", color: "#2ECC71", fontWeight: 600 }}>✓ Gültig</span>}
+                  </label>
+                </div>
                 <label style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                   <span style={{ fontSize: "14px", fontWeight: 700, color: "#4E4262" }}>Postleitzahl</span>
                   <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
@@ -761,7 +807,7 @@ export default function Home() {
                   />
                   <span>
                     Ich stimme zu, dass meine Daten für einen Rückruf und WhatsApp-Kontakt genutzt werden und akzeptiere die{" "}
-                    <a href="#" style={{ color: "#DB2C14", textDecoration: "underline" }}>
+                    <a href="/datenschutz.html" target="_blank" style={{ color: "#DB2C14", textDecoration: "underline" }}>
                       Datenschutzerklärung
                     </a>
                     .
@@ -806,7 +852,7 @@ export default function Home() {
                 ✓
               </span>
               <span style={{ fontFamily: "var(--font-bricolage)", fontSize: "32px", fontWeight: 800, letterSpacing: "-0.02em" }}>
-                Ihr Platz ist reserviert, {formState.name || "danke"}.
+                Ihr Platz ist reserviert, {formState.vorname || "danke"}.
               </span>
               <span style={{ fontSize: "18px", lineHeight: "1.5", color: "#4E4262" }}>
                 Wir melden uns innerhalb von 24 Stunden, das Ergebnis kommt per WhatsApp. Legen Sie Ihre letzten Rechnungen für Strom, Gas und Versicherungen bereit.
@@ -826,16 +872,16 @@ export default function Home() {
             einsparprofis.de
           </span>
           <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
-            <a href="#" style={{ color: "#D8D0E4" }}>
+            <a href="/impressum.html" target="_blank" style={{ color: "#D8D0E4" }}>
               Impressum
             </a>
-            <a href="#" style={{ color: "#D8D0E4" }}>
+            <a href="/datenschutz.html" target="_blank" style={{ color: "#D8D0E4" }}>
               Datenschutz
             </a>
-            <a href="#" style={{ color: "#D8D0E4" }}>
+            <a href="/gutscheinbedingungen.html" target="_blank" style={{ color: "#D8D0E4" }}>
               Gutscheinbedingungen
             </a>
-            <a href="#" style={{ color: "#D8D0E4" }}>
+            <a href="mailto:info@einsparprofis.de" style={{ color: "#D8D0E4" }}>
               Kontakt
             </a>
           </div>
