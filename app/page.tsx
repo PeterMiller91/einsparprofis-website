@@ -172,8 +172,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          vorname: formState.vorname,
-          nachname: formState.nachname,
+          name: `${formState.vorname} ${formState.nachname}`,
           plz: formState.plz,
           tel: formState.tel,
           schaetzung: sparText,
