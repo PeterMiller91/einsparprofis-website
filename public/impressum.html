@@ -16,19 +16,19 @@
             font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: #1C1233;
             background: #FFF7EA;
-            line-height: 1.7;
+            line-height: 1.6;
         }
 
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 0 24px;
+            padding: 0 20px;
         }
 
         header {
             background: linear-gradient(135deg, #DB2C14 0%, #B8230F 100%);
             color: #FFFFFF;
-            padding: 80px 24px;
+            padding: clamp(40px, 10vw, 80px) 20px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -52,22 +52,24 @@
         }
 
         header h1 {
-            margin-bottom: 12px;
-            font-size: clamp(32px, 5vw, 56px);
+            margin: 0;
+            font-size: clamp(28px, 7vw, 52px);
             font-family: 'Bricolage Grotesque', sans-serif;
             font-weight: 800;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
         }
 
         header p {
-            font-size: 18px;
+            font-size: clamp(14px, 2vw, 16px);
             color: #FFD60A;
             font-weight: 600;
+            margin-top: 12px;
         }
 
         nav {
             background: #FFF7EA;
-            padding: 20px 24px;
+            padding: 16px 20px;
             border-bottom: 2px solid #E6D9C4;
             position: sticky;
             top: 0;
@@ -76,71 +78,64 @@
 
         nav .container {
             display: flex;
-            gap: 24px;
+            gap: 16px;
             align-items: center;
-            flex-wrap: wrap;
         }
 
         .back-link {
             color: #DB2C14;
             text-decoration: none;
             font-weight: 700;
+            font-size: clamp(14px, 2vw, 16px);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             transition: all 0.3s;
         }
 
         .back-link:hover {
-            gap: 12px;
+            gap: 10px;
         }
 
         .content {
-            padding: 60px 24px;
-        }
-
-        .content h2 {
-            margin-top: 50px;
-            margin-bottom: 20px;
-            font-size: clamp(18px, 5vw, 26px);
-            font-family: 'Bricolage Grotesque', sans-serif;
-            font-weight: 800;
-            color: #1C1233;
-            letter-spacing: -0.02em;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        .content h2::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 24px;
-            background: #DB2C14;
-            border-radius: 2px;
+            padding: clamp(32px, 8vw, 60px) 20px;
         }
 
         .section {
-            margin-bottom: 36px;
             background: #FFFFFF;
-            padding: 32px;
-            border-radius: 16px;
+            padding: clamp(24px, 5vw, 32px);
+            border-radius: 12px;
             border: 1px solid #E6D9C4;
-            box-shadow: 0 2px 8px rgba(28, 18, 51, 0.05);
+            margin-bottom: clamp(24px, 4vw, 36px);
             transition: all 0.3s;
         }
 
         .section:hover {
             border-color: #DB2C14;
-            box-shadow: 0 8px 24px rgba(219, 44, 20, 0.08);
+            box-shadow: 0 4px 16px rgba(219, 44, 20, 0.1);
+        }
+
+        .section h2 {
+            font-size: clamp(18px, 4vw, 24px);
+            font-family: 'Bricolage Grotesque', sans-serif;
+            font-weight: 800;
+            color: #1C1233;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #FFD60A;
+            line-height: 1.2;
         }
 
         .section p {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             color: #4E4262;
+            font-size: clamp(14px, 1.8vw, 16px);
+            line-height: 1.7;
+        }
+
+        .section p:last-child {
+            margin-bottom: 0;
         }
 
         .section strong {
@@ -148,55 +143,80 @@
             font-weight: 700;
         }
 
-        .contact-grid {
+        .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
             margin: 20px 0;
         }
 
-        .contact-card {
+        .info-card {
             background: linear-gradient(135deg, rgba(219, 44, 20, 0.05) 0%, rgba(255, 214, 10, 0.05) 100%);
-            padding: 20px;
-            border-radius: 12px;
+            padding: 16px;
+            border-radius: 10px;
             border: 1px solid #E6D9C4;
         }
 
-        .contact-card strong {
+        .info-card .label {
             display: block;
             color: #DB2C14;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 700;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             margin-bottom: 8px;
         }
 
-        .contact-card p {
+        .info-card .value {
+            font-size: clamp(14px, 2vw, 16px);
+            color: #1C1233;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .info-card a {
+            color: #DB2C14;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .info-card a:hover {
+            text-decoration: underline;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(255, 214, 10, 0.1) 0%, rgba(219, 44, 20, 0.05) 100%);
+            border-left: 4px solid #FFD60A;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .highlight-box p {
             margin: 0;
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: clamp(14px, 1.8vw, 15px);
         }
 
         footer {
             background: #1C1233;
             color: #D8D0E4;
-            padding: 60px 24px;
+            padding: clamp(40px, 8vw, 60px) 20px;
             text-align: center;
-            margin-top: 80px;
+            margin-top: clamp(40px, 8vw, 80px);
         }
 
         footer .container {
             display: flex;
             flex-direction: column;
-            gap: 32px;
+            gap: 24px;
         }
 
         .footer-links {
             display: flex;
-            gap: 24px;
+            gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
+            font-size: clamp(13px, 1.8vw, 15px);
         }
 
         footer a {
@@ -204,48 +224,38 @@
             text-decoration: none;
             font-weight: 700;
             transition: all 0.3s;
-            position: relative;
         }
 
-        footer a::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: #FFD60A;
-            transition: width 0.3s;
+        footer a:hover {
+            text-decoration: underline;
         }
 
-        footer a:hover::after {
-            width: 100%;
+        footer p {
+            margin: 0;
+            font-size: clamp(13px, 1.8vw, 14px);
         }
 
         .badge {
             display: inline-block;
             background: #DB2C14;
             color: #FFFFFF;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 999px;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         @media (max-width: 768px) {
             .content {
-                padding: 40px 24px;
+                padding: 24px 16px;
             }
 
             .section {
-                padding: 24px;
-            }
-
-            header {
-                padding: 60px 24px;
+                padding: 20px;
+                margin-bottom: 20px;
             }
 
             nav .container {
@@ -253,8 +263,12 @@
                 gap: 12px;
             }
 
-            .contact-grid {
+            .info-grid {
                 grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 40px 16px;
             }
         }
     </style>
@@ -263,52 +277,78 @@
     <header>
         <div class="container">
             <h1>Impressum</h1>
-            <p>Rechtliche Informationen & Kontakt</p>
+            <p>Informationen & Kontaktdaten</p>
         </div>
     </header>
 
     <nav>
         <div class="container">
-            <a href="/" class="back-link">← Zur Startseite</a>
+            <a href="/" class="back-link">← Startseite</a>
         </div>
     </nav>
 
     <div class="content">
         <div class="container">
+            <!-- Betreiber -->
             <div class="section">
                 <span class="badge">Gültig ab 7. Oktober 2026</span>
-                <h2>Impressum</h2>
-                <p><strong>Daniel Schultes</strong><br>
-                Energie- und Versicherungsmakler<br>
-                Trevesen 141<br>
-                95704 Pullenreuth</p>
-            </div>
+                <h2>Betreiber dieser Website</h2>
+                <p><strong>Daniel Schultes</strong></p>
+                <p>Energie- und Versicherungsmakler</p>
 
-            <div class="section">
-                <h2>Kontakt</h2>
-                <div class="contact-grid">
-                    <div class="contact-card">
-                        <strong>📧 E-Mail</strong>
-                        <p><a href="mailto:kontakt@einsparprofis.de" style="color: #DB2C14; text-decoration: none; font-weight: 700;">kontakt@einsparprofis.de</a></p>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <span class="label">📍 Adresse</span>
+                        <div class="value">
+                            Trevesen 141<br>
+                            95704 Pullenreuth<br>
+                            Deutschland
+                        </div>
                     </div>
-                    <div class="contact-card">
-                        <strong>📞 Telefon</strong>
-                        <p><a href="tel:+4915115524681" style="color: #DB2C14; text-decoration: none; font-weight: 700;">0151 15524681</a></p>
+                    <div class="info-card">
+                        <span class="label">🌐 Webseite</span>
+                        <div class="value">
+                            <a href="https://einsparprofis.de">einsparprofis.de</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Kontakt -->
             <div class="section">
-                <h2>Verbraucherstreitbeilegung/Universalschlichtungsstelle</h2>
+                <h2>Kontakt</h2>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <span class="label">📧 E-Mail</span>
+                        <div class="value">
+                            <a href="mailto:kontakt@einsparprofis.de">kontakt@einsparprofis.de</a>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <span class="label">📞 Telefon</span>
+                        <div class="value">
+                            <a href="tel:+4915115524681">+49 151 15524681</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Verbraucherstreitbeilegung -->
+            <div class="section">
+                <h2>Verbraucherstreitbeilegung / Universalschlichtungsstelle</h2>
                 <p>
                     Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
                     Verbraucherschlichtungsstelle teilzunehmen.
                 </p>
-                <p style="margin-top: 20px; font-size: 14px; color: #666;">
-                    <strong>Quelle:</strong> <a href="https://www.e-recht24.de" target="_blank" style="color: #DB2C14; text-decoration: underline;">https://www.e-recht24.de</a>
-                </p>
+                <div class="highlight-box">
+                    <p>
+                        Im Falle von Unstimmigkeiten bieten wir jedoch eine gütliche Einigung an.
+                        Kontaktieren Sie uns bitte direkt.
+                    </p>
+                </div>
             </div>
 
+            <!-- Datenschutz -->
             <div class="section">
                 <h2>Datenschutz</h2>
                 <p>
@@ -317,12 +357,56 @@
                 </p>
             </div>
 
-            <div class="section" style="background: linear-gradient(135deg, rgba(219, 44, 20, 0.05) 0%, rgba(255, 214, 10, 0.05) 100%); border-left-color: #DB2C14;">
-                <h2 style="color: #DB2C14;">Weitere Informationen</h2>
+            <!-- Haftung -->
+            <div class="section">
+                <h2>Haftung für Inhalte</h2>
                 <p>
-                    ✓ <a href="/datenschutz.html" style="color: #DB2C14; text-decoration: underline; font-weight: 700;">Datenschutzerklärung</a><br>
-                    ✓ <a href="/gutscheinbedingungen.html" style="color: #DB2C14; text-decoration: underline; font-weight: 700;">Gutscheinbedingungen</a><br>
-                    ✓ Alle Rechtsmittel vorbehalten
+                    Die Inhalte dieser Website wurden mit großer Sorgfalt zusammengestellt.
+                    Wir bemühen uns, die Informationen korrekt, aktuell und vollständig zu halten.
+                </p>
+                <p>
+                    Eine Haftung oder Garantie für die Richtigkeit, Vollständigkeit oder Aktualität
+                    wird jedoch nicht übernommen. Dies gilt besonders für Inhalte externer Websites,
+                    die über Links von unserer Website erreichbar sind.
+                </p>
+            </div>
+
+            <!-- Urheberrecht -->
+            <div class="section">
+                <h2>Urheberrecht & Nutzungsrechte</h2>
+                <p>
+                    Die auf dieser Website veröffentlichten Inhalte und Werke unterliegen dem deutschen
+                    Urheberrecht und internationalen Urheberrechtsabkommen.
+                </p>
+                <p>
+                    Jede Art von Vervielfältigung, Bearbeitung, Verbreitung und Verwertung außerhalb
+                    der Grenzen des Urheberrechtes bedarf der vorherigen schriftlichen Zustimmung des Autors.
+                </p>
+            </div>
+
+            <!-- Externe Links -->
+            <div class="section">
+                <h2>Haftung für externe Links</h2>
+                <p>
+                    Diese Website enthält Links zu externen Websites. Wir haben keinen Einfluss auf
+                    den Inhalt dieser Websites und übernehmen keine Verantwortung für deren Inhalte.
+                </p>
+                <p>
+                    Dies gilt für fehlerhafte Inhalte, Datenschutzverletzungen oder technische Probleme
+                    auf verlinkten Seiten. Die Betreiber dieser Websites sind allein verantwortlich.
+                </p>
+            </div>
+
+            <!-- Quelle -->
+            <div class="section" style="background: linear-gradient(135deg, rgba(219, 44, 20, 0.05) 0%, rgba(255, 214, 10, 0.05) 100%); border-left: 4px solid #DB2C14;">
+                <h2 style="border-bottom-color: #DB2C14;">Quelle & Rechtsinformation</h2>
+                <p>
+                    Dieses Impressum wurde erstellt mit Unterstützung von
+                    <a href="https://www.e-recht24.de" target="_blank" style="color: #DB2C14; text-decoration: underline; font-weight: 700;">eRecht24</a>.
+                </p>
+                <p>
+                    <strong>Stand:</strong> 7. Oktober 2026<br>
+                    <strong>Alle Rechtsmittel vorbehalten</strong>
                 </p>
             </div>
         </div>
@@ -332,9 +416,12 @@
         <div class="container">
             <div class="footer-links">
                 <a href="/">Startseite</a>
-                <a href="/impressum.html" target="_blank">Impressum</a>
-                <a href="/gutscheinbedingungen.html" target="_blank">Gutscheinbedingungen</a>
-                <a href="/datenschutz.html" target="_blank">Datenschutz</a>
+                <span style="color: #666;">•</span>
+                <a href="/impressum.html">Impressum</a>
+                <span style="color: #666;">•</span>
+                <a href="/datenschutz.html">Datenschutz</a>
+                <span style="color: #666;">•</span>
+                <a href="/gutscheinbedingungen.html">Gutscheinbedingungen</a>
             </div>
             <p>© 2026 Einsparprofis. Deine Ersparnis ist unser Erfolg.</p>
         </div>
