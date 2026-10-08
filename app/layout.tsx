@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Bricolage_Grotesque } from "next/font/google";
+import CookieBanner from "./components/CookieBanner";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-full flex flex-col bg-[#FFF7EA] text-[#1C1233]">
         {children}
+        <CookieBanner />
       </body>
     </html>
   );
