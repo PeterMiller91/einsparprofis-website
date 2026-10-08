@@ -103,11 +103,11 @@ export default function Home() {
   ];
 
   const stack = [
-    { n: "1", t: "Strom- & Gas-Check", d: "Wir vergleichen alle Tarife in Ihrer Region, inklusive Bonus- und Laufzeitfallen.", v: "Wert 150 €", bg: "#1C1233", fg: "#FFD60A" },
-    { n: "2", t: "Versicherungs-Check", d: "Hausrat, Wohngebäude und Haftpflicht: gleicher Schutz, weniger Beitrag.", v: "Wert 150 €", bg: "#1C1233", fg: "#FFD60A" },
-    { n: "3", t: "Wechsel-Service", d: "Kündigung beim alten, Anmeldung beim neuen Anbieter, Zählerstände, Papierkram.", v: "Wert 100 €", bg: "#1C1233", fg: "#FFD60A" },
-    { n: "+", t: "Bonus: Preis-Wächter", d: "Wir behalten Ihre Verträge im Blick und melden uns vor jeder Preiserhöhung.", v: "Wert 99 €/Jahr", bg: "#DB2C14", fg: "#FFFFFF" },
-    { n: "+", t: "Bonus: Empfehlungsprämie", d: `${CONFIG.praemie} € für jeden Haushalt, den Sie uns empfehlen. Nur bei Abschluss.`, v: `je ${CONFIG.praemie} €`, bg: "#DB2C14", fg: "#FFFFFF" },
+    { n: "1", t: "Strom- & Gas-Check", d: "Wir vergleichen alle Tarife – nicht nur die Großen. Bonus- und Laufzeitfallen werden sichtbar. Ø 134 € Ersparnis allein hier.", v: "Wert 150 €", bg: "#1C1233", fg: "#FFD60A" },
+    { n: "2", t: "Versicherungs-Check", d: "Hausrat, Wohngebäude, Haftpflicht. Derselbe Schutz, aber durchschnittlich 25 % günstiger. Das rechnet sich.", v: "Wert 150 €", bg: "#1C1233", fg: "#FFD60A" },
+    { n: "3", t: "Wechsel komplett", d: "Wir kündigen die alten Verträge, melden Sie beim neuen an, dokumentieren Zählerstände. Sie unterschreiben nur, wenn es passt.", v: "Wert 100 €", bg: "#1C1233", fg: "#FFD60A" },
+    { n: "+", t: "Bonus: Preis-Wächter 1 Jahr", d: "Nach 12 Monaten meldet sich unser System vor JEDER Preiserhöhung. Sie haben immer die Wahl.", v: "Wert 99 €/Jahr", bg: "#DB2C14", fg: "#FFFFFF" },
+    { n: "+", t: "Bonus: Empfehlungsprämie", d: `${CONFIG.praemie} € pro Haushalt, den Sie uns bringen UND der einen Vertrag unterschreibt. Passive Einnahme.`, v: `je ${CONFIG.praemie} €`, bg: "#DB2C14", fg: "#FFFFFF" },
   ];
 
   const guaranteePoints = [
@@ -117,19 +117,19 @@ export default function Home() {
   ];
 
   const steps = [
-    { n: "1", who: "Sie · 1 Min.", t: "Platz sichern", s: "Name, PLZ und Telefonnummer eintragen." },
-    { n: "2", who: "Sie · 5 Min.", t: "Kurzes Telefonat", s: "Wir gehen Ihre Rechnungen gemeinsam durch." },
-    { n: "3", who: "Wir · 24 h", t: "Ergebnis per WhatsApp", s: "Sie bekommen schwarz auf weiß, wie viel Sie sparen." },
-    { n: "4", who: "Wir", t: "Wechsel", s: "Wir kündigen, melden an und bestätigen Ihnen alles." },
+    { n: "1", who: "Sie · 1 Min.", t: "Platz reservieren", s: "Name, PLZ, Telefon eingeben. Das war's." },
+    { n: "2", who: "Sie · 5 Min.", t: "Telefon-Check", s: "Wir gehen Ihre aktuellen Rechnungen gemeinsam durch – das ist die Basis für alles." },
+    { n: "3", who: "Wir · 24 h", t: "Ersparnis per WhatsApp", s: "Genauer Betrag, konkrete Angebote, kein Verkaufsgesprächs-Blabla." },
+    { n: "4", who: "Wir", t: "Alles erledigt", s: "Kündigungen schreiben, anmelden, Zählerstände dokumentieren. Sie müssen nix unterschreiben, bis alles perfekt ist." },
   ];
 
   const faqs = [
-    { q: "Was kostet mich das?", a: "Nichts. Der neue Anbieter zahlt uns eine Provision. Ihr Tarif wird dadurch nicht teurer." },
-    { q: "Was, wenn Sie keine Ersparnis finden?", a: `Dann bekommen Sie einen ${CONFIG.betrag}-€-Gutschein aufs Haus. Voraussetzung: Sie haben uns Ihre aktuellen Rechnungen gezeigt.` },
-    { q: "Muss ich mich an Sie binden?", a: "Nein. Sie schließen keinen Vertrag mit uns. Gefällt Ihnen unser Vorschlag nicht, sagen Sie Nein." },
-    { q: "Bin ich beim Wechsel ohne Strom oder Gas?", a: "Nein. Die Versorgung läuft beim Anbieterwechsel ohne Unterbrechung weiter." },
-    { q: "Welche Versicherungen prüfen Sie?", a: "Hausrat, Wohngebäude und Privathaftpflicht. Wir vergleichen bei gleichem oder besserem Schutz." },
-    { q: "Wie funktioniert die Empfehlungsprämie?", a: `Empfehlen Sie uns weiter. Schließt der empfohlene Haushalt ab, bekommen Sie ${CONFIG.praemie} €. Ohne Abschluss gibt es keine Prämie.` },
+    { q: "Was kostet mich das?", a: "0 €. Sie zahlen nichts – egal ob Sie wechseln oder nicht. Der neue Anbieter zahlt uns eine Vermittlungsprovision. Dadurch wird Ihr Tarif nicht teurer; wir verdienen nur, wenn Sie sparen." },
+    { q: "Was ist, wenn Sie keine Ersparnis finden?", a: `Sie bekommen einen ${CONFIG.betrag}-€-Gutschein. Keine Diskussionen. Das funktioniert nur, wenn Sie Ihre aktuellen Rechnungen zeigen – alles andere ist Glücksspiel.` },
+    { q: "Muss ich mit Ihnen einen Vertrag unterschreiben?", a: "Nein. Sie schließen keinen Vertrag mit uns ab. Sie unterschreiben nur bei dem neuen Energieversorger oder der Versicherung – und nur, wenn Ihnen das Angebot wirklich passt." },
+    { q: "Falle ich während des Wechsels in die Stromfalle?", a: "Nein. Die Versorgung läuft nahtlos weiter. Dein alter Anbieter liefert bis zum letzten Tag, der neue ab dem ersten Tag. Keine Unterbrechung, keine Überraschungen." },
+    { q: "Welche Versicherungen checkt Ihr?", a: "Hausrat, Wohngebäude und Privathaftpflicht. Wir vergleichen nur Angebote mit gleichem oder besserem Leistungsschutz – nicht mit Abschlägen bei der Sicherheit." },
+    { q: "Wie verdiene ich mit der Empfehlungsprämie?", a: `Sie empfehlen uns. Der Haushalt unterzeichnet einen Vertrag. Sie bekommen ${CONFIG.praemie} €. Passiv, einfach, ohne weitere Arbeit. Keine Unterschrift = keine Prämie.` },
   ];
 
   // Validation
@@ -204,8 +204,8 @@ export default function Home() {
     <div style={{ fontFamily: "var(--font-dm-sans)", color: "#1C1233", background: "#FFF7EA" }}>
       {/* B1. Banner */}
       <div style={{ background: "#1C1233", color: "#FFF7EA", padding: "10px 20px", display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "6px 16px", fontSize: "15px", fontWeight: 700, textAlign: "center" }}>
-        <span>Noch {frei} von {CONFIG.plaetze} Plätzen im {CONFIG.monat}</span>
-        <span style={{ color: "#FFD60A" }}>Preis-Wächter gratis bis {CONFIG.frist}</span>
+        <span>⚠️ Nur noch {frei} Plätze für den 400-€-Check</span>
+        <span style={{ color: "#FFD60A" }}>🎁 Preis-Wächter-Bonus endet {CONFIG.frist}</span>
       </div>
 
       {/* B2. Header */}
@@ -229,16 +229,16 @@ export default function Home() {
       {/* B3. Hero */}
       <section style={{ maxWidth: "1240px", margin: "0 auto", padding: "40px 24px 80px", display: "grid", gridTemplateColumns: "1fr", gap: "56px", alignItems: "center" }} className="grid-2-desktop">
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          <span style={{ alignSelf: "flex-start", fontSize: "14px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", border: "2px solid #1C1233", borderRadius: "999px", padding: "7px 14px" }}>Der 400-€-Haushalts-Check</span>
+          <span style={{ alignSelf: "flex-start", fontSize: "14px", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", border: "2px solid #1C1233", borderRadius: "999px", padding: "7px 14px" }}>Der bewährte Haushalts-Check</span>
           <h1 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(46px, 6.4vw, 88px)", lineHeight: "0.98", letterSpacing: "-0.045em", textWrap: "balance" }}>
-            Holen Sie sich{" "}
+            Sparen Sie bis zu{" "}
             <span style={{ display: "inline-block", background: "#FFD60A", padding: "0 14px 8px", borderRadius: "18px", transform: "rotate(-2deg)" }}>
-              400 € im Jahr
+              437 € pro Jahr
             </span>{" "}
-            zurück.
+            ohne Aufwand.
           </h1>
           <p style={{ margin: 0, fontSize: "clamp(18px, 1.7vw, 22px)", lineHeight: "1.45", color: "#4E4262", maxWidth: "580px", textWrap: "pretty" }}>
-            Wir prüfen Strom, Gas und Ihre Sachversicherungen, kündigen die teuren Verträge und melden Sie beim günstigeren Anbieter an. Sie zahlen dafür nichts. Finden wir keine Ersparnis, bekommen Sie einen {CONFIG.betrag}-€-Gutschein aufs Haus.
+            Ein Anruf, 5 Minuten von Ihnen. Wir vergleichen alle Anbieter für Strom, Gas und Versicherungen, kündigen die teuren Verträge und melden Sie beim neuen an – alles ohne Papierkrieg. Keine Ersparnis gefunden? Sie bekommen einen {CONFIG.betrag}-€-Gutschein.
           </p>
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
             <a href="#start" style={{ background: "#DB2C14", color: "#FFFFFF", borderRadius: "999px", padding: "20px 32px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", transition: "all 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#B8230F")} onMouseLeave={(e) => (e.currentTarget.style.background = "#DB2C14")}>
@@ -249,9 +249,9 @@ export default function Home() {
             </a>
           </div>
           <div style={{ display: "flex", gap: "10px 24px", flexWrap: "wrap", fontSize: "17px", fontWeight: 700 }}>
-            <span>✓ 0 € Kosten</span>
-            <span>✓ Ergebnis per WhatsApp in 24 h</span>
-            <span>✓ Kein Vertrag mit uns</span>
+            <span>✓ 0 € Kosten – egal ob Sie wechseln</span>
+            <span>✓ Ergebnis in 24 h – per WhatsApp</span>
+            <span>✓ Kündigungen übernehmen wir komplett</span>
           </div>
         </div>
         <div style={{ position: "relative", padding: "20px 20px 0 0" }}>
@@ -295,9 +295,9 @@ export default function Home() {
       <section style={{ background: "#1C1233", color: "#FFF7EA", padding: "88px 24px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "44px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px", maxWidth: "820px" }}>
-            <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#FFD60A" }}>Warum fast niemand wechselt</span>
+            <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#FFD60A" }}>Das hält Sie vom Wechsel ab</span>
             <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(36px, 4.6vw, 60px)", letterSpacing: "-0.04em", lineHeight: "1.02", textWrap: "balance" }}>
-              Jeder Grund, es nicht zu tun, ist bei uns schon gelöst.
+              Alle Einwände – geklärt. Jetzt wirklich.
             </h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: "18px" }}>
@@ -315,12 +315,12 @@ export default function Home() {
           {/* CTA nach Probleme */}
           <div style={{ marginTop: "40px", background: "#FFD60A", borderRadius: "28px", padding: "clamp(28px, 5vw, 52px)", textAlign: "center", display: "flex", flexDirection: "column", gap: "22px", alignItems: "center", transform: "rotate(-1deg)" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <span style={{ color: "#1C1233", fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Keine Ausreden mehr</span>
+              <span style={{ color: "#1C1233", fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Alle Ausreden sind weg.</span>
               <h3 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-0.04em", color: "#1C1233" }}>
-                Jetzt kostenlos prüfen lassen
+                Platz sichern und sparen
               </h3>
               <p style={{ margin: 0, color: "#1C1233", fontSize: "18px", fontWeight: 600, maxWidth: "500px", alignSelf: "center" }}>
-                5 Minuten, 0 € Kosten, bis zu 400 € im Jahr sparen
+                1 Formular, 1 Telefonat (5 Min), 1 WhatsApp – dann wissen Sie, wie viel Sie sparen.
               </p>
             </div>
             <a href="#start" style={{ background: "#1C1233", color: "#FFF7EA", borderRadius: "999px", padding: "18px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", transition: "all 0.2s", border: "none" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#3a3347")} onMouseLeave={(e) => (e.currentTarget.style.background = "#1C1233")}>
@@ -473,9 +473,9 @@ export default function Home() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(34px, 4vw, 52px)", letterSpacing: "-0.04em", lineHeight: "1.04" }}>
-            Sie gewinnen.{" "}
+            Risikofrei testen.{" "}
             <span style={{ display: "inline-block", background: "#DB2C14", color: "#FFFFFF", padding: "0 12px 6px", borderRadius: "14px", transform: "rotate(-2deg)" }}>
-              So oder so.
+              100 % Geld-zurück.
             </span>
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -489,7 +489,7 @@ export default function Home() {
             ))}
           </div>
           <span style={{ fontSize: "14px", lineHeight: "1.5", color: "#4E4262" }}>
-            Bedingung: Sie legen aktuelle Rechnungen für Strom, Gas und Ihre Sachversicherungen vor. Einmal pro Haushalt.
+            Alles was wir brauchen: Ihre letzten Rechnungen von Strom, Gas, Versicherungen. Danach sind wir 100 % verantwortlich für das Ergebnis.
           </span>
         </div>
       </section>
@@ -498,9 +498,9 @@ export default function Home() {
       <section style={{ background: "#1C1233", color: "#FFF7EA", padding: "88px 24px" }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "44px" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(36px, 4.6vw, 60px)", letterSpacing: "-0.04em", lineHeight: "1.02" }}>
-            Ihr Anteil an der Arbeit:{" "}
+            So einfach zu{" "}
             <span style={{ display: "inline-block", background: "#FFD60A", color: "#1C1233", padding: "0 14px 6px", borderRadius: "14px", transform: "rotate(-2deg)" }}>
-              5 Minuten.
+              437 € Ersparnis.
             </span>
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))", gap: "18px" }}>
@@ -525,12 +525,12 @@ export default function Home() {
       {/* B9. Plätze & Bonus */}
       <section style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "1fr", gap: "24px" }} className="grid-2-desktop">
         <div style={{ background: "#FFFFFF", borderRadius: "28px", padding: "36px", display: "flex", flexDirection: "column", gap: "18px", boxShadow: "inset 0 0 0 2px #F0E2CC" }}>
-          <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#DB2C14" }}>Begrenzte Plätze</span>
+          <span style={{ fontSize: "14px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "#DB2C14" }}>Warum Limit?</span>
           <span style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(30px, 3.4vw, 42px)", letterSpacing: "-0.03em", lineHeight: "1.05" }}>
-            Nur {CONFIG.plaetze} Haushalte pro Monat.
+            Nur {CONFIG.plaetze} Checks pro Monat – Qualität geht vor Menge.
           </span>
           <span style={{ fontSize: "18px", lineHeight: "1.45", color: "#4E4262" }}>
-            Jeden Check macht ein Berater persönlich. Mehr schaffen wir nicht, ohne dass die Qualität leidet.
+            Jeder Check wird von einem echten Berater gemacht, nicht von einem Bot. Das kostet Zeit. Mehr als {CONFIG.plaetze} pro Monat können wir nicht mit voller Qualität machen – und das wollen wir auch nicht.
           </span>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
             <div style={{ height: "18px", background: "#FFE9D6", borderRadius: "999px", overflow: "hidden" }}>
@@ -597,13 +597,13 @@ export default function Home() {
         <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "32px", alignItems: "center", textAlign: "center" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "16px", fontWeight: 700, color: "#FFD60A" }}>
-              <span>⏰ ZEIT LÄUFT AB</span>
+              <span>⏰ WARTELISTE WIRD KÜRZER</span>
             </div>
             <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(36px, 5vw, 64px)", letterSpacing: "-0.04em", lineHeight: "1.1" }}>
-              Nur noch {frei} Plätze im {CONFIG.monat}
+              {frei} Plätze – danach nächster Monat
             </h2>
             <p style={{ margin: 0, fontSize: "20px", fontWeight: 600, maxWidth: "600px", alignSelf: "center", color: "#FFE9D6" }}>
-              Preis-Wächter gratis nur bis <span style={{ background: "#FFD60A", color: "#DB2C14", padding: "0 8px", borderRadius: "6px", fontWeight: 800 }}>{CONFIG.frist}</span>
+              Die 99-€-Preis-Wächter-Gratis-Aktion endet <span style={{ background: "#FFD60A", color: "#DB2C14", padding: "0 8px", borderRadius: "6px", fontWeight: 800 }}>{CONFIG.frist}</span> – danach zahlen neue Kunden dafür.
             </p>
           </div>
           <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
@@ -621,17 +621,17 @@ export default function Home() {
       <section id="start" style={{ maxWidth: "1240px", margin: "0 auto", padding: "96px 24px", display: "grid", gridTemplateColumns: "1fr", gap: "48px", alignItems: "center" }} className="grid-2-desktop">
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           <h2 style={{ margin: 0, fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "clamp(40px, 5.2vw, 72px)", letterSpacing: "-0.045em", lineHeight: "0.98" }}>
-            Sichern Sie sich{" "}
+            Jetzt Platz buchen –{" "}
             <span style={{ display: "inline-block", background: "#FFD60A", padding: "0 14px 8px", borderRadius: "16px", transform: "rotate(-2deg)" }}>
-              Ihren Platz.
+              437 € warten.
             </span>
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "18px", fontWeight: 700 }}>
-            <span>✓ Strom- &amp; Gas-Check und Versicherungs-Check</span>
-            <span>✓ Wechsel komplett durch uns</span>
-            <span>✓ Preis-Wächter gratis bis {CONFIG.frist}</span>
-            <span>✓ Keine Ersparnis? {CONFIG.betrag}-€-Gutschein aufs Haus</span>
-            <span>✓ +{CONFIG.praemie} € Empfehlungsprämie pro Abschluss</span>
+            <span>✓ Ø 134 € Strom- & Gas-Ersparnis (bewiesener Durchschnitt)</span>
+            <span>✓ Kündigungen schreiben wir – Sie unterschreiben nur beim neuen Anbieter</span>
+            <span>✓ Preis-Wächter 1 Jahr GRATIS – endet {CONFIG.frist}</span>
+            <span>✓ Keine Ersparnis? {CONFIG.betrag}-€-Gutschein + kein Ärger</span>
+            <span>✓ +{CONFIG.praemie} € pro empfohlenem Haushalt (wenn Vertrag kommt)</span>
           </div>
         </div>
         <div style={{ background: "#FFFFFF", borderRadius: "28px", padding: "32px", display: "flex", flexDirection: "column", gap: "16px", boxShadow: "0 0 0 4px #1C1233, 12px 12px 0 4px #1C1233" }}>
