@@ -2,781 +2,651 @@
 
 import { useEffect, useState } from "react";
 
-type CookieConsent = {
-  essential: boolean;
-  analytics: boolean;
+interface ConsentData {
+  v: number;
+  necessary: boolean;
+  statistics: boolean;
   marketing: boolean;
-  preferences: boolean;
-};
+  ts: number;
+}
 
 export default function CookieBanner() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
-  const [consent, setConsent] = useState<CookieConsent>({
-    essential: true,
-    analytics: false,
+  const [showBanner, setShowBanner] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
+  const [consent, setConsent] = useState<ConsentData>({
+    v: 1,
+    necessary: true,
+    statistics: false,
     marketing: false,
-    preferences: false,
+    ts: Date.now(),
   });
 
   useEffect(() => {
-    const storedConsent = localStorage.getItem("cookieConsent");
-    if (!storedConsent) {
-      setIsVisible(true);
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    const stored = localStorage.getItem("ep_consent");
+    if (stored) {
+      const parsed = JSON.parse(stored) as ConsentData;
+      if (parsed.v === 1) {
+        setConsent(parsed);
+        loadScripts(parsed);
+      } else {
+        setShowBanner(true);
+      }
     } else {
-      setConsent(JSON.parse(storedConsent));
-      loadCookieScripts(JSON.parse(storedConsent));
+      setShowBanner(true);
     }
-  }, []);
 
-  const loadCookieScripts = (consentData: CookieConsent) => {
-    if (consentData.analytics) {
-      loadGoogleAnalytics();
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showModal) {
+        setShowModal(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, [showModal]);
+
+  const loadScripts = (data: ConsentData) => {
+    if (data.statistics) {
+      const scripts = document.querySelectorAll('[data-consent="statistics"]');
+      scripts.forEach((script) => {
+        const newScript = document.createElement("script");
+        if (script.textContent) newScript.textContent = script.textContent;
+        script.parentNode?.replaceChild(newScript, script);
+      });
     }
-    if (consentData.marketing) {
-      loadMarketingScripts();
+    if (data.marketing) {
+      const scripts = document.querySelectorAll('[data-consent="marketing"]');
+      scripts.forEach((script) => {
+        const newScript = document.createElement("script");
+        if (script.textContent) newScript.textContent = script.textContent;
+        script.parentNode?.replaceChild(newScript, script);
+      });
     }
   };
 
-  const loadGoogleAnalytics = () => {
-    const script1 = document.createElement("script");
-    script1.async = true;
-    script1.src = "https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX";
-    document.head.appendChild(script1);
-
-    const script2 = document.createElement("script");
-    script2.innerHTML = `
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
-    `;
-    document.head.appendChild(script2);
-  };
-
-  const loadMarketingScripts = () => {
-    const fbPixelScript = document.createElement("script");
-    fbPixelScript.innerHTML = `
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', 'YOUR_PIXEL_ID');
-      fbq('track', 'PageView');
-    `;
-    document.head.appendChild(fbPixelScript);
+  const saveConsent = (data: ConsentData) => {
+    const consentData = { ...data, ts: Date.now() };
+    localStorage.setItem("ep_consent", JSON.stringify(consentData));
+    setConsent(consentData);
+    setShowBanner(false);
+    setShowModal(false);
+    loadScripts(consentData);
   };
 
   const handleAcceptAll = () => {
-    const allConsent: CookieConsent = {
-      essential: true,
-      analytics: true,
-      marketing: true,
-      preferences: true,
-    };
-    saveConsent(allConsent);
+    saveConsent({ v: 1, necessary: true, statistics: true, marketing: true, ts: Date.now() });
   };
 
-  const handleRejectAll = () => {
-    const minimalConsent: CookieConsent = {
-      essential: true,
-      analytics: false,
-      marketing: false,
-      preferences: false,
-    };
-    saveConsent(minimalConsent);
+  const handleOnlyNecessary = () => {
+    saveConsent({ v: 1, necessary: true, statistics: false, marketing: false, ts: Date.now() });
   };
 
-  const handleSavePreferences = () => {
+  const handleSaveSettings = () => {
     saveConsent(consent);
   };
 
-  const saveConsent = (consentData: CookieConsent) => {
-    localStorage.setItem("cookieConsent", JSON.stringify(consentData));
-    localStorage.setItem("cookieConsentDate", new Date().toISOString());
-    setConsent(consentData);
-    setIsVisible(false);
-    setShowDetails(false);
-    loadCookieScripts(consentData);
-  };
+  if (!showBanner && !showModal) return null;
 
-  if (!isVisible) return null;
+  const colors = {
+    ink: "#1C1233",
+    cream: "#FFF7EA",
+    red: "#DB2C14",
+    yellow: "#FFD60A",
+    white: "#FFFFFF",
+    muted: "#4E4262",
+    divider: "#F0E6D6",
+    toggleOff: "#CFC4B4",
+    handle: "#E3D8C6",
+    overlay: "rgba(28,18,51,0.45)",
+  };
 
   return (
     <>
       {/* Overlay */}
-      {isVisible && (
+      {(showBanner || showModal) && (
         <div
           style={{
             position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "rgba(28, 18, 51, 0.5)",
+            inset: 0,
+            background: colors.overlay,
             zIndex: 999,
+            pointerEvents: showModal ? "auto" : "none",
           }}
+          onClick={() => showModal && setShowModal(false)}
         />
       )}
 
-      {/* Banner Container */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: "#FFFFFF",
-          boxShadow: "0 -8px 32px rgba(28, 18, 51, 0.15)",
-          zIndex: 1000,
-          animation: "slideUp 0.3s ease-out",
-        }}
-      >
-        <style>{`
-          @keyframes slideUp {
-            from {
-              transform: translateY(100%);
-              opacity: 0;
-            }
-            to {
-              transform: translateY(0);
-              opacity: 1;
-            }
-          }
-
-          @media (max-width: 768px) {
-            .cookie-banner-content {
-              padding: 20px 16px !important;
-            }
-            .cookie-banner-title {
-              font-size: 18px !important;
-            }
-            .cookie-banner-text {
-              font-size: 14px !important;
-            }
-            .cookie-banner-buttons {
-              flex-direction: column !important;
-              gap: 10px !important;
-            }
-            .cookie-banner-button {
-              width: 100% !important;
-            }
-          }
-        `}</style>
-
+      {/* Desktop Banner */}
+      {isDesktop && showBanner && !showModal && (
         <div
-          className="cookie-banner-content"
+          role="banner"
           style={{
-            maxWidth: "1240px",
-            margin: "0 auto",
-            padding: "32px 24px",
+            position: "fixed",
+            left: "24px",
+            right: "24px",
+            bottom: "24px",
+            background: colors.white,
+            borderRadius: "24px",
+            boxShadow: "0 24px 60px rgba(28,18,51,.35)",
+            padding: "28px 32px",
             display: "flex",
-            flexDirection: "column",
-            gap: "24px",
+            gap: "32px",
+            alignItems: "center",
+            zIndex: 1000,
+            maxWidth: "calc(100% - 48px)",
           }}
         >
-          {!showDetails ? (
-            <>
-              {/* Main Banner */}
-              <div style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}>
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <h3
-                    className="cookie-banner-title"
-                    style={{
-                      margin: 0,
-                      fontFamily: "var(--font-bricolage)",
-                      fontSize: "24px",
-                      fontWeight: 800,
-                      color: "#1C1233",
-                    }}
-                  >
-                    🍪 Wir nutzen Cookies
-                  </h3>
-                  <p
-                    className="cookie-banner-text"
-                    style={{
-                      margin: 0,
-                      fontSize: "16px",
-                      lineHeight: "1.5",
-                      color: "#4E4262",
-                    }}
-                  >
-                    Wir verwenden Cookies, um Ihre Erfahrung zu verbessern, Ihre Daten zu schützen und die Website zu optimieren. Einige Cookies sind notwendig (essentiell), während andere Ihnen helfen, unsere Dienste besser zu nutzen.
+          {/* Icon */}
+          <div
+            style={{
+              width: "64px",
+              height: "64px",
+              minWidth: "64px",
+              borderRadius: "50%",
+              background: colors.yellow,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "var(--font-bricolage)",
+              fontSize: "30px",
+              fontWeight: 800,
+              transform: "rotate(-6deg)",
+            }}
+          >
+            %
+          </div>
+
+          {/* Text Block */}
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "6px" }}>
+            <h2
+              style={{
+                margin: 0,
+                fontFamily: "var(--font-bricolage)",
+                fontSize: "26px",
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                color: colors.ink,
+              }}
+            >
+              Ihr 400-€-Check funktioniert auch ohne Werbe-Cookies.
+            </h2>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "16px",
+                lineHeight: "1.5",
+                color: colors.muted,
+              }}
+            >
+              Notwendige Cookies brauchen wir, damit Rechner und Formular funktionieren. Mit Ihrer Zustimmung messen wir zusätzlich, welche Werbung Sie zu uns gebracht hat. Sie können das jederzeit im Footer ändern.{" "}
+              <a href="/datenschutz.html" style={{ color: colors.red, fontWeight: 700 }}>
+                Datenschutz
+              </a>{" "}
+              · <a href="/impressum.html" style={{ color: colors.red, fontWeight: 700 }}>
+                Impressum
+              </a>
+            </p>
+          </div>
+
+          {/* Buttons */}
+          <div style={{ width: "260px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <button
+              onClick={handleOnlyNecessary}
+              style={{
+                height: "52px",
+                borderRadius: "999px",
+                background: colors.ink,
+                color: colors.cream,
+                border: "none",
+                fontSize: "16px",
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            >
+              Nur notwendige
+            </button>
+            <button
+              onClick={handleAcceptAll}
+              style={{
+                height: "52px",
+                borderRadius: "999px",
+                background: colors.ink,
+                color: colors.cream,
+                border: "none",
+                fontSize: "16px",
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            >
+              Alle akzeptieren
+            </button>
+            <button
+              onClick={() => setShowModal(true)}
+              style={{
+                height: "32px",
+                background: "transparent",
+                color: colors.ink,
+                border: "none",
+                fontSize: "15px",
+                fontWeight: 700,
+                cursor: "pointer",
+                textDecoration: "underline",
+                textUnderlineOffset: "3px",
+              }}
+            >
+              Einstellungen
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Bottom Sheet */}
+      {!isDesktop && showBanner && !showModal && (
+        <div
+          role="banner"
+          style={{
+            position: "fixed",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: colors.white,
+            borderRadius: "28px 28px 0 0",
+            boxShadow: "0 -12px 40px rgba(28,18,51,.3)",
+            padding: `14px 20px calc(34px + env(safe-area-inset-bottom))`,
+            display: "flex",
+            flexDirection: "column",
+            gap: "14px",
+            zIndex: 1000,
+          }}
+        >
+          {/* Handle */}
+          <div
+            style={{
+              width: "40px",
+              height: "5px",
+              borderRadius: "3px",
+              background: colors.handle,
+              margin: "0 auto",
+            }}
+          />
+
+          {/* Icon + Headline */}
+          <div style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+            <div
+              style={{
+                width: "44px",
+                height: "44px",
+                minWidth: "44px",
+                borderRadius: "50%",
+                background: colors.yellow,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: "var(--font-bricolage)",
+                fontSize: "22px",
+                fontWeight: 800,
+                transform: "rotate(-6deg)",
+              }}
+            >
+              %
+            </div>
+            <h2
+              style={{
+                margin: 0,
+                fontFamily: "var(--font-bricolage)",
+                fontSize: "22px",
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                lineHeight: "1.05",
+                color: colors.ink,
+                flex: 1,
+              }}
+            >
+              Ihr 400-€-Check funktioniert auch ohne Werbe-Cookies.
+            </h2>
+          </div>
+
+          {/* Text */}
+          <p
+            style={{
+              margin: 0,
+              fontSize: "15px",
+              lineHeight: "1.5",
+              color: colors.muted,
+            }}
+          >
+            Notwendige Cookies brauchen wir, damit Rechner und Formular funktionieren. Mit Ihrer Zustimmung messen wir zusätzlich, welche Werbung Sie zu uns gebracht hat.{" "}
+            <a href="/datenschutz.html" style={{ color: colors.red, fontWeight: 700 }}>
+              Datenschutz
+            </a>
+          </p>
+
+          {/* Buttons Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+            <button
+              onClick={handleOnlyNecessary}
+              style={{
+                height: "52px",
+                borderRadius: "999px",
+                background: colors.ink,
+                color: colors.cream,
+                border: "none",
+                fontSize: "15px",
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              Nur notwendige
+            </button>
+            <button
+              onClick={handleAcceptAll}
+              style={{
+                height: "52px",
+                borderRadius: "999px",
+                background: colors.ink,
+                color: colors.cream,
+                border: "none",
+                fontSize: "15px",
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              Alle akzeptieren
+            </button>
+          </div>
+
+          {/* Settings Button */}
+          <button
+            onClick={() => setShowModal(true)}
+            style={{
+              height: "44px",
+              background: "transparent",
+              color: colors.ink,
+              border: "none",
+              fontSize: "15px",
+              fontWeight: 700,
+              cursor: "pointer",
+              textDecoration: "underline",
+              textUnderlineOffset: "3px",
+            }}
+          >
+            Einstellungen
+          </button>
+        </div>
+      )}
+
+      {/* Modal */}
+      {showModal && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cookie-modal-title"
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: colors.white,
+            borderRadius: "24px",
+            padding: "32px",
+            width: isDesktop ? "600px" : "calc(100% - 40px)",
+            maxHeight: isDesktop ? "auto" : "calc(100vh - 180px)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "20px",
+            zIndex: 1001,
+            overflow: "auto",
+          }}
+        >
+          {/* Header */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3
+              id="cookie-modal-title"
+              style={{
+                margin: 0,
+                fontFamily: "var(--font-bricolage)",
+                fontSize: "28px",
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                color: colors.ink,
+              }}
+            >
+              Cookie-Einstellungen
+            </h3>
+            <button
+              onClick={() => setShowModal(false)}
+              aria-label="Schließen"
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "50%",
+                border: `2px solid ${colors.ink}`,
+                background: "transparent",
+                fontSize: "24px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = colors.ink;
+                e.currentTarget.style.color = colors.cream;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.color = colors.ink;
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Categories */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {/* Necessary */}
+            <div style={{ padding: "16px 0", borderTop: `2px solid ${colors.divider}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: "17px", fontWeight: 700, color: colors.ink }}>
+                    Notwendig · immer aktiv
+                  </h4>
+                  <p style={{ margin: "4px 0 0 0", fontSize: "14px", lineHeight: "1.45", color: colors.muted }}>
+                    Speichert Ihre Cookie-Auswahl und hält Rechner und Formular am Laufen.
                   </p>
                 </div>
-              </div>
-
-              {/* Buttons */}
-              <div
-                className="cookie-banner-buttons"
-                style={{
-                  display: "flex",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <button
-                  className="cookie-banner-button"
-                  onClick={handleRejectAll}
-                  style={{
-                    flex: 1,
-                    minWidth: "140px",
-                    padding: "14px 24px",
-                    background: "#FFFFFF",
-                    color: "#1C1233",
-                    border: "2px solid #E6D9C4",
-                    borderRadius: "999px",
-                    fontSize: "16px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#DB2C14";
-                    e.currentTarget.style.background = "#FFF7EA";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#E6D9C4";
-                    e.currentTarget.style.background = "#FFFFFF";
-                  }}
-                >
-                  Ablehnen
-                </button>
-
-                <button
-                  onClick={() => setShowDetails(true)}
-                  style={{
-                    flex: 1,
-                    minWidth: "140px",
-                    padding: "14px 24px",
-                    background: "transparent",
-                    color: "#1C1233",
-                    border: "2px solid #1C1233",
-                    borderRadius: "999px",
-                    fontSize: "16px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#1C1233";
-                    e.currentTarget.style.color = "#FFF7EA";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = "#1C1233";
-                  }}
-                >
-                  Einstellungen
-                </button>
-
-                <button
-                  className="cookie-banner-button"
-                  onClick={handleAcceptAll}
-                  style={{
-                    flex: 1,
-                    minWidth: "140px",
-                    padding: "14px 24px",
-                    background: "#DB2C14",
-                    color: "#FFFFFF",
-                    border: "none",
-                    borderRadius: "999px",
-                    fontSize: "16px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#B8230F";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#DB2C14";
-                  }}
-                >
-                  Alle akzeptieren
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* Details View */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                <h3
-                  style={{
-                    margin: 0,
-                    fontFamily: "var(--font-bricolage)",
-                    fontSize: "24px",
-                    fontWeight: 800,
-                    color: "#1C1233",
-                  }}
-                >
-                  Cookie-Einstellungen
-                </h3>
-
-                {/* Essential Cookies */}
                 <div
+                  role="switch"
+                  aria-checked="true"
                   style={{
-                    background: "#F8F7F3",
-                    borderRadius: "16px",
-                    padding: "20px",
-                    border: "2px solid #E6D9C4",
+                    width: "56px",
+                    height: "32px",
+                    borderRadius: "999px",
+                    background: colors.red,
+                    padding: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                    marginLeft: "12px",
+                    marginTop: "2px",
+                    opacity: 0.55,
+                    cursor: "not-allowed",
                   }}
                 >
                   <div
                     style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: "16px",
-                      marginBottom: "12px",
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "50%",
+                      background: colors.white,
+                      marginLeft: "auto",
+                      transition: "all 0.2s",
                     }}
-                  >
-                    <div>
-                      <h4
-                        style={{
-                          margin: 0,
-                          fontSize: "18px",
-                          fontWeight: 700,
-                          color: "#1C1233",
-                        }}
-                      >
-                        ✓ Erforderliche Cookies
-                      </h4>
-                      <p
-                        style={{
-                          margin: "4px 0 0 0",
-                          fontSize: "14px",
-                          color: "#4E4262",
-                        }}
-                      >
-                        Immer aktiv – für Sicherheit & Funktionalität
-                      </p>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={true}
-                      disabled
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        cursor: "not-allowed",
-                      }}
-                    />
-                  </div>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: "20px",
-                      fontSize: "14px",
-                      color: "#4E4262",
-                      lineHeight: "1.6",
-                    }}
-                  >
-                    <li>Session-Cookies (Formular-Daten)</li>
-                    <li>CSRF-Schutz (Sicherheit)</li>
-                    <li>Cookie-Einstellungen (dieses Banner)</li>
-                  </ul>
+                  />
                 </div>
-
-                {/* Analytics Cookies */}
-                <div
-                  style={{
-                    background: "#F8F7F3",
-                    borderRadius: "16px",
-                    padding: "20px",
-                    border: "2px solid #E6D9C4",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: "16px",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    <div>
-                      <h4
-                        style={{
-                          margin: 0,
-                          fontSize: "18px",
-                          fontWeight: 700,
-                          color: "#1C1233",
-                        }}
-                      >
-                        📊 Analytics & Performance
-                      </h4>
-                      <p
-                        style={{
-                          margin: "4px 0 0 0",
-                          fontSize: "14px",
-                          color: "#4E4262",
-                        }}
-                      >
-                        Helfen uns, die Website zu verbessern
-                      </p>
-                    </div>
-                    <label
-                      style={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "48px",
-                        height: "28px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={consent.analytics}
-                        onChange={(e) =>
-                          setConsent({
-                            ...consent,
-                            analytics: e.target.checked,
-                          })
-                        }
-                        style={{
-                          display: "none",
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "absolute",
-                          width: "100%",
-                          height: "100%",
-                          background: consent.analytics ? "#DB2C14" : "#E6D9C4",
-                          borderRadius: "999px",
-                          transition: "all 0.2s",
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "relative",
-                          width: "24px",
-                          height: "24px",
-                          background: "#FFFFFF",
-                          borderRadius: "50%",
-                          marginLeft: consent.analytics ? "auto" : "2px",
-                          marginRight: consent.analytics ? "2px" : "auto",
-                          transition: "all 0.2s",
-                          zIndex: 1,
-                        }}
-                      />
-                    </label>
-                  </div>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: "20px",
-                      fontSize: "14px",
-                      color: "#4E4262",
-                      lineHeight: "1.6",
-                    }}
-                  >
-                    <li>Google Analytics (Besucherzahlen, Verhalten)</li>
-                    <li>Hotjar (Heatmaps, Session-Aufzeichnungen)</li>
-                    <li>Performance-Metriken</li>
-                  </ul>
-                </div>
-
-                {/* Marketing Cookies */}
-                <div
-                  style={{
-                    background: "#F8F7F3",
-                    borderRadius: "16px",
-                    padding: "20px",
-                    border: "2px solid #E6D9C4",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: "16px",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    <div>
-                      <h4
-                        style={{
-                          margin: 0,
-                          fontSize: "18px",
-                          fontWeight: 700,
-                          color: "#1C1233",
-                        }}
-                      >
-                        📢 Marketing & Remarketing
-                      </h4>
-                      <p
-                        style={{
-                          margin: "4px 0 0 0",
-                          fontSize: "14px",
-                          color: "#4E4262",
-                        }}
-                      >
-                        Personalisierte Werbeanzeigen & Verfolgung
-                      </p>
-                    </div>
-                    <label
-                      style={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "48px",
-                        height: "28px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={consent.marketing}
-                        onChange={(e) =>
-                          setConsent({
-                            ...consent,
-                            marketing: e.target.checked,
-                          })
-                        }
-                        style={{
-                          display: "none",
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "absolute",
-                          width: "100%",
-                          height: "100%",
-                          background: consent.marketing ? "#DB2C14" : "#E6D9C4",
-                          borderRadius: "999px",
-                          transition: "all 0.2s",
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "relative",
-                          width: "24px",
-                          height: "24px",
-                          background: "#FFFFFF",
-                          borderRadius: "50%",
-                          marginLeft: consent.marketing ? "auto" : "2px",
-                          marginRight: consent.marketing ? "2px" : "auto",
-                          transition: "all 0.2s",
-                          zIndex: 1,
-                        }}
-                      />
-                    </label>
-                  </div>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: "20px",
-                      fontSize: "14px",
-                      color: "#4E4262",
-                      lineHeight: "1.6",
-                    }}
-                  >
-                    <li>Facebook Pixel (Remarketing, Conversions)</li>
-                    <li>Google Ads (Werbekampagnen)</li>
-                    <li>TikTok Pixel (Cross-Platform Marketing)</li>
-                    <li>LinkedIn Insight Tag (B2B Tracking)</li>
-                  </ul>
-                </div>
-
-                {/* Preferences Cookies */}
-                <div
-                  style={{
-                    background: "#F8F7F3",
-                    borderRadius: "16px",
-                    padding: "20px",
-                    border: "2px solid #E6D9C4",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      gap: "16px",
-                      marginBottom: "12px",
-                    }}
-                  >
-                    <div>
-                      <h4
-                        style={{
-                          margin: 0,
-                          fontSize: "18px",
-                          fontWeight: 700,
-                          color: "#1C1233",
-                        }}
-                      >
-                        ⚙️ Voreinstellungen
-                      </h4>
-                      <p
-                        style={{
-                          margin: "4px 0 0 0",
-                          fontSize: "14px",
-                          color: "#4E4262",
-                        }}
-                      >
-                        Speichert Ihre Einstellungen & Präferenzen
-                      </p>
-                    </div>
-                    <label
-                      style={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "center",
-                        width: "48px",
-                        height: "28px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={consent.preferences}
-                        onChange={(e) =>
-                          setConsent({
-                            ...consent,
-                            preferences: e.target.checked,
-                          })
-                        }
-                        style={{
-                          display: "none",
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "absolute",
-                          width: "100%",
-                          height: "100%",
-                          background: consent.preferences ? "#DB2C14" : "#E6D9C4",
-                          borderRadius: "999px",
-                          transition: "all 0.2s",
-                        }}
-                      />
-                      <div
-                        style={{
-                          position: "relative",
-                          width: "24px",
-                          height: "24px",
-                          background: "#FFFFFF",
-                          borderRadius: "50%",
-                          marginLeft: consent.preferences ? "auto" : "2px",
-                          marginRight: consent.preferences ? "2px" : "auto",
-                          transition: "all 0.2s",
-                          zIndex: 1,
-                        }}
-                      />
-                    </label>
-                  </div>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: "20px",
-                      fontSize: "14px",
-                      color: "#4E4262",
-                      lineHeight: "1.6",
-                    }}
-                  >
-                    <li>Spracheinstellungen</li>
-                    <li>Design-Präferenzen (Dark/Light Mode)</li>
-                    <li>Gespeicherte Filtereinstellungen</li>
-                  </ul>
-                </div>
-
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "13px",
-                    color: "#4E4262",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  Detaillierte Informationen finden Sie in unserer{" "}
-                  <a
-                    href="/datenschutz.html"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: "#DB2C14",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    Datenschutzerklärung
-                  </a>
-                  .
-                </p>
               </div>
+            </div>
 
-              {/* Action Buttons */}
-              <div
-                style={{
-                  display: "flex",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <button
-                  onClick={() => setShowDetails(false)}
+            {/* Statistics */}
+            <div style={{ padding: "16px 0", borderTop: `2px solid ${colors.divider}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: "17px", fontWeight: 700, color: colors.ink }}>Statistik</h4>
+                  <p style={{ margin: "4px 0 0 0", fontSize: "14px", lineHeight: "1.45", color: colors.muted }}>
+                    Anonyme Messung, welche Seiten gelesen werden. Hilft uns, die Seite zu verbessern.
+                  </p>
+                </div>
+                <label
+                  role="switch"
+                  aria-checked={consent.statistics}
                   style={{
-                    flex: 1,
-                    minWidth: "140px",
-                    padding: "14px 24px",
-                    background: "#FFFFFF",
-                    color: "#1C1233",
-                    border: "2px solid #E6D9C4",
+                    width: "56px",
+                    height: "32px",
                     borderRadius: "999px",
-                    fontSize: "16px",
-                    fontWeight: 700,
+                    background: consent.statistics ? colors.red : colors.toggleOff,
+                    padding: "4px",
+                    display: "flex",
+                    alignItems: "center",
                     cursor: "pointer",
+                    marginLeft: "12px",
+                    marginTop: "2px",
                     transition: "all 0.2s",
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#DB2C14";
-                    e.currentTarget.style.background = "#FFF7EA";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#E6D9C4";
-                    e.currentTarget.style.background = "#FFFFFF";
-                  }}
                 >
-                  Zurück
-                </button>
+                  <input
+                    type="checkbox"
+                    checked={consent.statistics}
+                    onChange={(e) => setConsent({ ...consent, statistics: e.target.checked })}
+                    style={{ display: "none" }}
+                  />
+                  <div
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "50%",
+                      background: colors.white,
+                      transition: "all 0.2s",
+                      marginLeft: consent.statistics ? "auto" : "0",
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
 
-                <button
-                  onClick={handleSavePreferences}
+            {/* Marketing */}
+            <div style={{ padding: "16px 0", borderTop: `2px solid ${colors.divider}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: "17px", fontWeight: 700, color: colors.ink }}>Marketing</h4>
+                  <p style={{ margin: "4px 0 0 0", fontSize: "14px", lineHeight: "1.45", color: colors.muted }}>
+                    Zeigt uns, ob Sie über Flyer, Aufkleber oder Anzeige gekommen sind.
+                  </p>
+                </div>
+                <label
+                  role="switch"
+                  aria-checked={consent.marketing}
                   style={{
-                    flex: 1,
-                    minWidth: "140px",
-                    padding: "14px 24px",
-                    background: "#DB2C14",
-                    color: "#FFFFFF",
-                    border: "none",
+                    width: "56px",
+                    height: "32px",
                     borderRadius: "999px",
-                    fontSize: "16px",
-                    fontWeight: 700,
+                    background: consent.marketing ? colors.red : colors.toggleOff,
+                    padding: "4px",
+                    display: "flex",
+                    alignItems: "center",
                     cursor: "pointer",
+                    marginLeft: "12px",
+                    marginTop: "2px",
                     transition: "all 0.2s",
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#B8230F";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#DB2C14";
-                  }}
                 >
-                  Einstellungen speichern
-                </button>
+                  <input
+                    type="checkbox"
+                    checked={consent.marketing}
+                    onChange={(e) => setConsent({ ...consent, marketing: e.target.checked })}
+                    style={{ display: "none" }}
+                  />
+                  <div
+                    style={{
+                      width: "24px",
+                      height: "24px",
+                      borderRadius: "50%",
+                      background: colors.white,
+                      transition: "all 0.2s",
+                      marginLeft: consent.marketing ? "auto" : "0",
+                    }}
+                  />
+                </label>
               </div>
-            </>
-          )}
+            </div>
+          </div>
+
+          {/* Footer Buttons */}
+          <div style={{ display: isDesktop ? "grid" : "flex", gridTemplateColumns: isDesktop ? "1fr 1fr" : undefined, flexDirection: isDesktop ? undefined : "column", gap: "10px", marginTop: "12px" }}>
+            <button
+              onClick={handleSaveSettings}
+              style={{
+                height: isDesktop ? "auto" : "52px",
+                padding: isDesktop ? "14px" : "0",
+                borderRadius: "999px",
+                background: colors.white,
+                color: colors.ink,
+                border: `2px solid ${colors.ink}`,
+                fontSize: "16px",
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = colors.ink;
+                e.currentTarget.style.color = colors.cream;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = colors.white;
+                e.currentTarget.style.color = colors.ink;
+              }}
+            >
+              Auswahl speichern
+            </button>
+            <button
+              onClick={handleAcceptAll}
+              style={{
+                height: isDesktop ? "auto" : "52px",
+                padding: isDesktop ? "14px" : "0",
+                borderRadius: "999px",
+                background: colors.ink,
+                color: colors.cream,
+                border: "none",
+                fontSize: "16px",
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
+              onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
+            >
+              Alle akzeptieren
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

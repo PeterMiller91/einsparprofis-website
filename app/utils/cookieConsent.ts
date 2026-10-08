@@ -1,40 +1,40 @@
-export type CookieConsent = {
-  essential: boolean;
-  analytics: boolean;
+export interface ConsentData {
+  v: number;
+  necessary: boolean;
+  statistics: boolean;
   marketing: boolean;
-  preferences: boolean;
-};
+  ts: number;
+}
 
-export const getCookieConsent = (): CookieConsent | null => {
+export const getCookieConsent = (): ConsentData | null => {
   if (typeof window === "undefined") return null;
 
-  const stored = localStorage.getItem("cookieConsent");
+  const stored = localStorage.getItem("ep_consent");
   if (!stored) return null;
 
   try {
-    return JSON.parse(stored);
+    return JSON.parse(stored) as ConsentData;
   } catch {
     return null;
   }
 };
 
-export const hasCookieConsent = (type: keyof CookieConsent): boolean => {
+export const hasCookieConsent = (category: "statistics" | "marketing"): boolean => {
   const consent = getCookieConsent();
-  return consent?.[type] ?? false;
+  return consent?.[category] ?? false;
 };
 
 export const isConsentGiven = (): boolean => {
-  const stored = localStorage.getItem("cookieConsent");
+  const stored = localStorage.getItem("ep_consent");
   return stored !== null;
 };
 
-export const getConsentDate = (): string | null => {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("cookieConsentDate");
+export const getConsentTimestamp = (): number | null => {
+  const consent = getCookieConsent();
+  return consent?.ts ?? null;
 };
 
 export const resetCookieConsent = (): void => {
   if (typeof window === "undefined") return;
-  localStorage.removeItem("cookieConsent");
-  localStorage.removeItem("cookieConsentDate");
+  localStorage.removeItem("ep_consent");
 };
