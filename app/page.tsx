@@ -241,7 +241,7 @@ export default function Home() {
             Ein Anruf, 5 Minuten von Ihnen. Wir vergleichen alle Anbieter für Strom, Gas und Versicherungen, kündigen die teuren Verträge und melden Sie beim neuen an – alles ohne Papierkrieg. Keine Ersparnis gefunden? Sie bekommen einen {CONFIG.betrag}-€-Gutschein.
           </p>
           <div style={{ display: "flex", gap: "14px", flexWrap: "wrap", alignItems: "center" }}>
-            <a href="#start" style={{ background: "#DB2C14", color: "#FFFFFF", borderRadius: "999px", padding: "20px 32px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", transition: "all 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#B8230F")} onMouseLeave={(e) => (e.currentTarget.style.background = "#DB2C14")}>
+            <a href="#start" className="cta-btn" style={{ background: "#DB2C14", color: "#FFFFFF", borderRadius: "999px", padding: "20px 32px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", transition: "all 0.2s" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#B8230F")} onMouseLeave={(e) => (e.currentTarget.style.background = "#DB2C14")}>
               Platz sichern →
             </a>
             <a href="#rechner" style={{ color: "#1C1233", fontWeight: 700, fontSize: "18px", borderBottom: "2px solid #1C1233", paddingBottom: "2px", display: "inline-block" }}>
@@ -255,7 +255,7 @@ export default function Home() {
           </div>
         </div>
         <div style={{ position: "relative", padding: "20px 20px 0 0" }}>
-          <div style={{ position: "absolute", top: "-12px", right: "-4px", width: "132px", height: "132px", borderRadius: "50%", background: "#DB2C14", color: "#FFFFFF", transform: "rotate(12deg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-bricolage)", fontWeight: 800, lineHeight: "1", textAlign: "center", zIndex: 1 }}>
+          <div className="value-badge" style={{ position: "absolute", top: "-12px", right: "-4px", width: "132px", height: "132px", borderRadius: "50%", background: "#DB2C14", color: "#FFFFFF", transform: "rotate(12deg)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-bricolage)", fontWeight: 800, lineHeight: "1", textAlign: "center", zIndex: 1 }}>
             <span style={{ fontSize: "15px" }}>Wert</span>
             <span style={{ fontSize: "34px", textDecoration: "line-through", textDecorationColor: "#FFD60A" }}>450 €</span>
             <span style={{ fontSize: "18px" }}>für 0 €</span>
@@ -269,17 +269,17 @@ export default function Home() {
               </span>
             </span>
             {["Strom- & Gas-Check", "Versicherungs-Check", "Wechsel-Service"].map((m, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "baseline", gap: "10px", padding: "8px 0", fontSize: "19px", fontWeight: 700 }}>
+              <div key={i} className="menu-row" style={{ display: "flex", alignItems: "baseline", gap: "10px", padding: "8px 0", fontSize: "19px", fontWeight: 700 }}>
                 <span style={{ whiteSpace: "nowrap" }}>{m}</span>
                 <span style={{ flex: 1, borderBottom: "2px dotted #1C1233", transform: "translateY(-4px)" }}></span>
-                <span style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800 }}>0,00 €</span>
+                <span style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, whiteSpace: "nowrap" }}>0,00 €</span>
               </div>
             ))}
             <div style={{ marginTop: "8px", borderTop: "2px solid #1C1233", paddingTop: "10px", display: "flex", flexDirection: "column", gap: "4px" }}>
-              <div style={{ display: "flex", alignItems: "baseline", gap: "10px", fontSize: "19px", fontWeight: 700 }}>
+              <div className="menu-row" style={{ display: "flex", alignItems: "baseline", gap: "10px", fontSize: "19px", fontWeight: 700 }}>
                 <span style={{ whiteSpace: "nowrap" }}>Empfehlungsprämie</span>
                 <span style={{ flex: 1, borderBottom: "2px dotted #1C1233", transform: "translateY(-4px)" }}></span>
-                <span style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, background: "#FFD60A", borderRadius: "6px", padding: "0 6px 2px", transform: "rotate(-3deg)" }}>+{CONFIG.praemie},00 €</span>
+                <span style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, background: "#FFD60A", borderRadius: "6px", padding: "0 6px 2px", transform: "rotate(-3deg)", whiteSpace: "nowrap" }}>+{CONFIG.praemie},00 €</span>
               </div>
               <span style={{ fontSize: "14px", fontWeight: 500, color: "#4E4262" }}>Für jeden Haushalt, den Sie uns empfehlen.* *nur bei Abschluss</span>
             </div>
@@ -323,7 +323,7 @@ export default function Home() {
                 1 Formular, 1 Telefonat (5 Min), 1 WhatsApp – dann wissen Sie, wie viel Sie sparen.
               </p>
             </div>
-            <a href="#start" style={{ background: "#1C1233", color: "#FFF7EA", borderRadius: "999px", padding: "18px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", transition: "all 0.2s", border: "none" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#3a3347")} onMouseLeave={(e) => (e.currentTarget.style.background = "#1C1233")}>
+            <a href="#start" className="cta-btn" style={{ background: "#1C1233", color: "#FFF7EA", borderRadius: "999px", padding: "18px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", transition: "all 0.2s", border: "none" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#3a3347")} onMouseLeave={(e) => (e.currentTarget.style.background = "#1C1233")}>
               Platz sichern →
             </a>
           </div>
@@ -416,17 +416,17 @@ export default function Home() {
           </div>
           <div style={{ background: "#FFFFFF", borderRadius: "28px", padding: "clamp(20px, 3vw, 36px)", display: "flex", flexDirection: "column", boxShadow: "0 0 0 4px #1C1233, 12px 12px 0 4px #1C1233" }}>
             {stack.map((s, i) => (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "44px minmax(0, 1fr) auto", gap: "16px", alignItems: "start", padding: "20px 0", borderBottom: i < stack.length - 1 ? "2px solid #F0E2CC" : "none" }}>
-                <span style={{ width: "44px", height: "44px", borderRadius: "50%", background: s.bg, color: s.fg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "18px" }}>
+              <div key={i} className="stack-row" style={{ display: "grid", gridTemplateColumns: "44px minmax(0, 1fr) auto", gap: "16px", alignItems: "start", padding: "20px 0", borderBottom: i < stack.length - 1 ? "2px solid #F0E2CC" : "none" }}>
+                <span className="stack-icon" style={{ width: "44px", height: "44px", borderRadius: "50%", background: s.bg, color: s.fg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "18px" }}>
                   {s.n}
                 </span>
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                  <span style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "24px", letterSpacing: "-0.02em" }}>
+                  <span className="stack-title" style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "24px", letterSpacing: "-0.02em" }}>
                     {s.t}
                   </span>
                   <span style={{ fontSize: "17px", lineHeight: "1.45", color: "#4E4262" }}>{s.d}</span>
                 </div>
-                <span style={{ fontWeight: 700, fontSize: "18px", whiteSpace: "nowrap", paddingTop: "4px" }}>{s.v}</span>
+                <span className="stack-value" style={{ fontWeight: 700, fontSize: "18px", whiteSpace: "nowrap", paddingTop: "4px" }}>{s.v}</span>
               </div>
             ))}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "20px", flexWrap: "wrap", paddingTop: "26px" }}>
@@ -607,10 +607,10 @@ export default function Home() {
             </p>
           </div>
           <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", justifyContent: "center" }}>
-            <a href="#start" style={{ background: "#FFD60A", color: "#DB2C14", borderRadius: "999px", padding: "20px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", transition: "all 0.2s", border: "none", textDecoration: "none" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#FFF7EA")} onMouseLeave={(e) => (e.currentTarget.style.background = "#FFD60A")}>
+            <a href="#start" className="cta-btn" style={{ background: "#FFD60A", color: "#DB2C14", borderRadius: "999px", padding: "20px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", transition: "all 0.2s", border: "none", textDecoration: "none" }} onMouseEnter={(e) => (e.currentTarget.style.background = "#FFF7EA")} onMouseLeave={(e) => (e.currentTarget.style.background = "#FFD60A")}>
               Letzter Platz sichern →
             </a>
-            <a href="#rechner" style={{ background: "transparent", color: "#FFD60A", borderRadius: "999px", padding: "20px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", border: "2px solid #FFD60A", transition: "all 0.2s", textDecoration: "none" }} onMouseEnter={(e) => { e.currentTarget.style.background = "#FFD60A"; e.currentTarget.style.color = "#DB2C14"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#FFD60A"; }}>
+            <a href="#rechner" className="cta-btn" style={{ background: "transparent", color: "#FFD60A", borderRadius: "999px", padding: "20px 42px", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "22px", display: "inline-block", cursor: "pointer", border: "2px solid #FFD60A", transition: "all 0.2s", textDecoration: "none" }} onMouseEnter={(e) => { e.currentTarget.style.background = "#FFD60A"; e.currentTarget.style.color = "#DB2C14"; }} onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#FFD60A"; }}>
               Erst Ersparnis rechnen
             </a>
           </div>
@@ -856,6 +856,12 @@ export default function Home() {
               <span style={{ fontSize: "18px", lineHeight: "1.5", color: "#4E4262" }}>
                 Wir melden uns innerhalb von 24 Stunden, das Ergebnis kommt per WhatsApp. Legen Sie Ihre letzten Rechnungen für Strom, Gas und Versicherungen bereit.
               </span>
+              <a
+                href={`/abrechnung-hochladen?${new URLSearchParams({ vorname: formState.vorname, nachname: formState.nachname, src: "nach-lead" })}`}
+                style={{ background: "#DB2C14", color: "#FFFFFF", borderRadius: "999px", padding: "16px 24px", textAlign: "center", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "19px", display: "block" }}
+              >
+                Abrechnungen jetzt schon hochladen →
+              </a>
               <span onClick={handleReset} style={{ fontWeight: 700, color: "#DB2C14", cursor: "pointer", textDecoration: "underline" }}>
                 Angaben ändern
               </span>
@@ -879,6 +885,9 @@ export default function Home() {
             </a>
             <a href="/gutscheinbedingungen.html" target="_blank" style={{ color: "#D8D0E4" }}>
               Gutscheinbedingungen
+            </a>
+            <a href="/abrechnung-hochladen" style={{ color: "#D8D0E4" }}>
+              Abrechnung hochladen
             </a>
             <a href="mailto:info@einsparprofis.de" style={{ color: "#D8D0E4" }}>
               Kontakt
