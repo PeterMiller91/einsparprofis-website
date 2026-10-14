@@ -856,6 +856,12 @@ export default function Home() {
               <span style={{ fontSize: "18px", lineHeight: "1.5", color: "#4E4262" }}>
                 Wir melden uns innerhalb von 24 Stunden, das Ergebnis kommt per WhatsApp. Legen Sie Ihre letzten Rechnungen für Strom, Gas und Versicherungen bereit.
               </span>
+              <a
+                href={`/abrechnung-hochladen?${new URLSearchParams({ vorname: formState.vorname, nachname: formState.nachname, src: "nach-lead" })}`}
+                style={{ background: "#DB2C14", color: "#FFFFFF", borderRadius: "999px", padding: "16px 24px", textAlign: "center", fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: "19px", display: "block" }}
+              >
+                Abrechnungen jetzt schon hochladen →
+              </a>
               <span onClick={handleReset} style={{ fontWeight: 700, color: "#DB2C14", cursor: "pointer", textDecoration: "underline" }}>
                 Angaben ändern
               </span>
@@ -879,6 +885,9 @@ export default function Home() {
             </a>
             <a href="/gutscheinbedingungen.html" target="_blank" style={{ color: "#D8D0E4" }}>
               Gutscheinbedingungen
+            </a>
+            <a href="/abrechnung-hochladen" style={{ color: "#D8D0E4" }}>
+              Abrechnung hochladen
             </a>
             <a href="mailto:info@einsparprofis.de" style={{ color: "#D8D0E4" }}>
               Kontakt

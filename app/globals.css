@@ -138,3 +138,14 @@ input {
     max-width: 100% !important;
   }
 }
+
+/* Only on touch devices (e.g. camera button in the upload form) */
+.mobile-only {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .mobile-only {
+    display: inline-block;
+  }
+}
