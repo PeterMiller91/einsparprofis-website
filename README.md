@@ -53,14 +53,32 @@ Personalisierter Link, z. B. für WhatsApp: `/abrechnung-hochladen?vorname=Anna&
 
 Die Dateien sind außerdem im Vercel-Dashboard unter **Storage → Blob** einsehbar.
 
+### Google Drive (optional, empfohlen)
+
+Ist Google Drive verbunden, kopiert der Server jede Abrechnung nach der Prüfung in den Ordner
+`Einsparprofis Abrechnungen/JJJJ-MM/<Upload>/` in deinem Google Drive und löscht sie danach im Vercel-Speicher.
+Die Telegram-Nachricht enthält dann Drive-Links. Klappt die Übertragung nicht, bleiben die Dateien im Vercel-Speicher, und die Nachricht weist darauf hin.
+Die Website nutzt nur die Berechtigung `drive.file` und sieht deshalb ausschließlich die Dateien, die sie selbst angelegt hat.
+
+Einmalige Einrichtung:
+
+1. [Google Cloud Console](https://console.cloud.google.com) → Projekt wählen (z. B. das von Google Sheets) → **APIs & Dienste → Bibliothek** → „Google Drive API“ aktivieren.
+2. **Google Auth Platform → Branding**: App-Name (z. B. „Einsparprofis Upload“) und deine E-Mail eintragen. **Zielgruppe**: „Extern“, danach **App veröffentlichen** („In Produktion“). Im Testmodus läuft die Freigabe nach 7 Tagen ab.
+3. **Clients → Client erstellen** → Typ „Webanwendung“ → autorisierte Weiterleitungs-URI: `https://einsparprofis.de/api/drive/callback`. Client-ID und Clientschlüssel kopieren.
+4. In Vercel setzen: `GOOGLE_DRIVE_CLIENT_ID`, `GOOGLE_DRIVE_CLIENT_SECRET` und `DRIVE_SETUP_KEY` (ein selbst gewähltes, langes Passwort). Danach neu deployen.
+5. `https://einsparprofis.de/api/drive/connect?key=<DRIVE_SETUP_KEY>` öffnen und mit deinem Google-Konto anmelden. Den Hinweis „Google hat diese App nicht überprüft“ mit „Erweitert → Weiter zu …“ bestätigen; das ist deine eigene App.
+6. Den angezeigten Schlüssel als `GOOGLE_DRIVE_REFRESH_TOKEN` in Vercel eintragen und neu deployen. `DRIVE_SETUP_KEY` kannst du danach wieder löschen.
+
+
 ### API
 
 | Route | Zweck |
 | --- | --- |
 | `POST /api/abrechnung/session` | Prüft Formular und Dateiliste, vergibt Dateinamen und signierte Upload-Tickets |
 | `POST /api/abrechnung/upload` | Erstellt kurzlebige Client-Tokens für Vercel Blob (nur für signierte Pfade) |
-| `POST /api/abrechnung/complete` | Prüft die Dateien (Dateisignatur), speichert die Angaben und benachrichtigt per Telegram |
-| `GET /api/abrechnung/datei?t=…` | Signierter Download-Link → Weiterleitung auf eine 10 Minuten gültige Blob-URL |
+| `POST /api/abrechnung/complete` | Prüft die Dateien (Dateisignatur), kopiert sie im Hintergrund nach Google Drive und benachrichtigt per Telegram |
+| `GET /api/abrechnung/datei?t=…` | Signierter Download-Link → Weiterleitung auf eine 10 Minuten gültige Blob-URL (nur ohne Drive) |
+| `GET /api/drive/connect?key=…` / `GET /api/drive/callback` | Einmalige Verbindung mit Google Drive |
 
 ## Landingpages
 

@@ -1,7 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { BlobNotFoundError, del, get, head, put } from "@vercel/blob";
 import { typLabel, formatBytes, type AbrechnungTyp } from "@/app/lib/abrechnung";
+import { DRIVE_ROOT_FOLDER, ensureFolder, getAccessToken, isDriveConfigured, uploadFile } from "@/app/lib/googleDrive";
 import { sign, verify, type UploadSession } from "@/app/lib/uploadSigning";
+
+// Copying up to 10 × 20 MB to Google Drive runs after the response – give it time
+export const maxDuration = 300;
 
 const DOWNLOAD_LINK_TTL = 30 * 24 * 60 * 60 * 1000; // links in Telegram stay valid for 30 days
 
@@ -48,7 +52,32 @@ async function exists(pathname: string) {
   }
 }
 
-async function notifyTelegram(session: UploadSession, origin: string) {
+/** Copies the files from the Blob buffer into Google Drive: Einsparprofis Abrechnungen/<Monat>/<Upload>/ */
+async function copyToDrive(session: UploadSession) {
+  const accessToken = await getAccessToken();
+  const [, month, uploadFolder] = session.folder.split("/");
+  const root = await ensureFolder(accessToken, DRIVE_ROOT_FOLDER);
+  const monthFolder = await ensureFolder(accessToken, month, root.id);
+  const folder = await ensureFolder(accessToken, uploadFolder, monthFolder.id);
+
+  const links: Record<string, string> = {};
+  for (const f of session.files) {
+    const blob = await get(f.pathname, { access: "private", useCache: false });
+    if (!blob || blob.statusCode !== 200) throw new Error(`Blob not found: ${f.pathname}`);
+    const data = await new Response(blob.stream).arrayBuffer();
+    const uploaded = await uploadFile(accessToken, { name: f.fileName, mimeType: blob.blob.contentType, parentId: folder.id, data });
+    links[f.pathname] = uploaded.webViewLink;
+  }
+
+  const angaben = new TextEncoder().encode(JSON.stringify({ ...session, completedAt: new Date().toISOString() }, null, 2));
+  await uploadFile(accessToken, { name: "_angaben.json", mimeType: "application/json", parentId: folder.id, data: angaben.buffer as ArrayBuffer });
+
+  return { folderLink: folder.webViewLink, links };
+}
+
+type Storage = { kind: "drive"; folderLink: string; links: Record<string, string> } | { kind: "blob"; driveFailed: boolean };
+
+async function notifyTelegram(session: UploadSession, origin: string, storage: Storage) {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!botToken || !chatId) {
@@ -57,9 +86,15 @@ async function notifyTelegram(session: UploadSession, origin: string) {
   }
 
   const fileLines = session.files.map((f) => {
-    const link = `${origin}/api/abrechnung/datei?t=${sign({ p: f.pathname }, DOWNLOAD_LINK_TTL)}`;
+    const link =
+      storage.kind === "drive" ? storage.links[f.pathname] : `${origin}/api/abrechnung/datei?t=${sign({ p: f.pathname }, DOWNLOAD_LINK_TTL)}`;
     return `📄 <a href="${escapeHtml(link)}">${escapeHtml(f.fileName)}</a> (${formatBytes(f.size)})`;
   });
+
+  const footer =
+    storage.kind === "drive"
+      ? `📁 <a href="${escapeHtml(storage.folderLink)}">Ordner in Google Drive öffnen</a>`
+      : `${storage.driveFailed ? "⚠️ Übertragung nach Google Drive fehlgeschlagen – Dateien liegen im Vercel-Speicher.\n" : ""}<i>Links 30 Tage gültig · Ordner: ${escapeHtml(session.folder)}</i>`;
 
   const message = `
 📥 <b>Neue Abrechnungen hochgeladen!</b>
@@ -71,7 +106,7 @@ async function notifyTelegram(session: UploadSession, origin: string) {
 
 ${fileLines.join("\n")}
 
-<i>Links 30 Tage gültig · Ordner: ${escapeHtml(session.folder)}</i>
+${footer}
   `.trim();
 
   const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -98,9 +133,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const metaPath = `${session.folder}/_angaben.json`;
-    // Idempotent: a repeated call (e.g. double click, retry) must not notify twice
-    if (await exists(metaPath)) {
+    // Marker without personal data – a repeated call (double click, retry) must not process twice
+    const markerPath = `${session.folder}/_erledigt.json`;
+    if (await exists(markerPath)) {
       return NextResponse.json({ success: true, files: session.files.map((f) => f.fileName) });
     }
 
@@ -126,20 +161,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Keep the form data next to the files for the archive
-    await put(metaPath, JSON.stringify({ ...session, completedAt: new Date().toISOString() }, null, 2), {
+    await put(markerPath, JSON.stringify({ completedAt: new Date().toISOString() }), {
       access: "private",
       contentType: "application/json",
       addRandomSuffix: false,
       allowOverwrite: true,
     });
 
-    try {
-      await notifyTelegram(session, request.nextUrl.origin);
-    } catch (telegramError) {
-      // Files are stored safely; notification failure must not fail the upload
-      console.error("Failed to send upload notification to Telegram:", telegramError);
-    }
+    // The customer gets the confirmation right away; Drive copy + notification run afterwards
+    const origin = request.nextUrl.origin;
+    after(async () => {
+      let storage: Storage = { kind: "blob", driveFailed: false };
+      if (isDriveConfigured()) {
+        try {
+          storage = { kind: "drive", ...(await copyToDrive(session)) };
+          // Drive is the archive now – don't keep a second copy of the bills
+          await del(session.files.map((f) => f.pathname));
+        } catch (driveError) {
+          console.error("Google Drive transfer failed, files stay in Blob:", driveError);
+          storage = { kind: "blob", driveFailed: true };
+        }
+      }
+      if (storage.kind === "blob") {
+        // Keep the form data next to the files for the archive
+        await put(`${session.folder}/_angaben.json`, JSON.stringify({ ...session, completedAt: new Date().toISOString() }, null, 2), {
+          access: "private",
+          contentType: "application/json",
+          addRandomSuffix: false,
+          allowOverwrite: true,
+        });
+      }
+
+      try {
+        await notifyTelegram(session, origin, storage);
+      } catch (telegramError) {
+        // Files are stored safely; notification failure must not fail the upload
+        console.error("Failed to send upload notification to Telegram:", telegramError);
+      }
+    });
 
     return NextResponse.json({ success: true, files: session.files.map((f) => f.fileName) }, { status: 201 });
   } catch (error) {
