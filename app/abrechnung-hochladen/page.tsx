@@ -20,7 +20,7 @@ export default async function AbrechnungHochladenPage({
   const params = await searchParams;
 
   return (
-    <div style={{ fontFamily: "var(--font-dm-sans)", color: "#1C1233", background: "#FFF7EA", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div className="legacy" style={{ fontFamily: "var(--font-dm-sans)", color: "#1C1233", background: "#FFF7EA", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <header style={{ maxWidth: "1240px", width: "100%", margin: "0 auto", padding: "18px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", flexWrap: "wrap" }}>
         <Link href="/" style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: "3px", fontFamily: "var(--font-bricolage)", color: "#1C1233" }} aria-label="Zur Startseite">
           <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", paddingLeft: "5px" }}>die</span>

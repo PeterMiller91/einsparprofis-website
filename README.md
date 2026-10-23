@@ -61,3 +61,14 @@ Die Dateien sind außerdem im Vercel-Dashboard unter **Storage → Blob** einseh
 | `POST /api/abrechnung/upload` | Erstellt kurzlebige Client-Tokens für Vercel Blob (nur für signierte Pfade) |
 | `POST /api/abrechnung/complete` | Prüft die Dateien (Dateisignatur), speichert die Angaben und benachrichtigt per Telegram |
 | `GET /api/abrechnung/datei?t=…` | Signierter Download-Link → Weiterleitung auf eine 10 Minuten gültige Blob-URL |
+
+## Landingpages
+
+| Adresse | Datei | Zielgruppe | Lead-Quelle (`src`) |
+| --- | --- | --- | --- |
+| `einsparprofis.de` | `app/page.tsx` | allgemein (Werbung, Social, Empfehlungen) | `allgemein` |
+| `gaststaette.einsparprofis.de` (auch `/gaststaette`) | `app/gaststaette/page.tsx` | Aufsteller in Gaststätten | `gaststaette` |
+
+- Ein `?src=…` in der URL überschreibt die Quelle, z. B. `einsparprofis.de/?src=facebook`. Die Quelle steht in der Telegram-Nachricht und in Google Sheets.
+- Plätze, Frist und Beträge für beide Seiten stehen zentral in `app/lib/angebot.ts`.
+- Die Subdomain wird in `proxy.ts` auf `/gaststaette` umgeschrieben. Dafür in Vercel unter **Settings → Domains** `gaststaette.einsparprofis.de` hinzufügen und beim Domain-Anbieter einen CNAME-Eintrag `gaststaette` → `cname.vercel-dns.com` anlegen.
