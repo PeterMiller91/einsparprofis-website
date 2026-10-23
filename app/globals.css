@@ -59,27 +59,32 @@ input {
 
 /* Responsive Grid Classes */
 .grid-2-desktop {
-  grid-template-columns: 1fr !important;
+  grid-template-columns: minmax(0, 1fr) !important;
 }
 
 .grid-2-desktop-v2 {
-  grid-template-columns: 1fr !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.grid-2-desktop > * {
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
   .grid-2-desktop {
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
   }
 
   .grid-2-desktop-v2 {
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
   }
 }
 
-/* Mobile Responsive Fixes */
+/* Mobile fixes for the inline-styled pages (Gaststätte, Upload) – scoped to .legacy
+   so they don't override the CSS-module based main page */
 @media (max-width: 640px) {
   /* Labels with space-between need to stack on mobile */
-  label span[style*="space-between"] {
+  .legacy label span[style*="space-between"] {
     flex-direction: column !important;
     gap: 8px !important;
   }
@@ -90,12 +95,12 @@ input {
   }
 
   /* Range sliders should be full width */
-  input[type="range"] {
+  .legacy input[type="range"] {
     max-width: 100%;
   }
 
   /* Ensure cards don't overflow */
-  div[style*="boxShadow"] {
+  .legacy div[style*="box-shadow"] {
     overflow-wrap: break-word;
     word-break: break-word;
   }
@@ -103,38 +108,118 @@ input {
 
 @media (max-width: 480px) {
   /* Extra small devices */
-  section {
+  .legacy section {
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
 
   /* Ensure label text wraps properly */
-  label span {
+  .legacy label span {
     word-break: break-word;
     overflow-wrap: break-word;
   }
 
-  /* Stack all flex items on mobile */
-  div[style*="flexDirection"] {
-    gap: 12px !important;
+  /* Reduce padding on cards – more room for text, fewer line breaks */
+  .legacy div[style*="border-radius:28px"],
+  .legacy div[style*="border-radius: 28px"],
+  .legacy div[style*="border-radius:24px"],
+  .legacy div[style*="border-radius: 24px"],
+  .legacy div[style*="border-radius:32px"],
+  .legacy div[style*="border-radius: 32px"] {
+    padding: 22px 18px !important;
   }
 
-  /* Reduce padding on cards */
-  div[style*="borderRadius: \"28px\""],
-  div[style*="borderRadius: \"24px\""] {
-    padding: 20px 16px !important;
+  /* Headline sizes for small screens */
+  .legacy h1 {
+    font-size: clamp(30px, 9vw, 40px) !important;
   }
 
-  /* Make text sizes smaller on mobile */
-  h1, h2, h3 {
-    font-size: clamp(24px, 6vw, 48px) !important;
+  .legacy h2 {
+    font-size: clamp(26px, 7.6vw, 34px) !important;
+  }
+
+  .legacy h3 {
+    font-size: clamp(22px, 6.6vw, 30px) !important;
+  }
+
+  /* Big call-to-action buttons: less side padding so the label fits on one line */
+  .legacy .cta-btn {
+    padding: 16px 22px !important;
+    font-size: 19px !important;
+    text-align: center;
   }
 
   /* Ensure inputs are fully visible */
-  input[type="text"],
-  input[type="tel"],
-  input[type="range"] {
+  .legacy input[type="text"],
+  .legacy input[type="tel"],
+  .legacy input[type="range"] {
     width: 100% !important;
     max-width: 100% !important;
+  }
+}
+
+/* Only on touch devices (e.g. camera button in the upload form) */
+.mobile-only {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .mobile-only {
+    display: inline-block;
+  }
+}
+
+/* Wertstapel ("Das ist alles drin"): on phones the value moves below the text
+   so the description can use the full width */
+@media (max-width: 600px) {
+  .stack-row {
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+    gap: 4px 12px !important;
+    padding: 16px 0 !important;
+  }
+
+  .stack-icon {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 16px !important;
+  }
+
+  .stack-title {
+    font-size: 20px !important;
+  }
+
+  .stack-value {
+    grid-column: 2;
+    font-size: 15px !important;
+    padding-top: 2px !important;
+    color: #DB2C14;
+  }
+}
+
+/* "Wert 450 €" badge on the hero card: smaller on phones so it doesn't cover the label */
+@media (max-width: 480px) {
+  .value-badge {
+    width: 96px !important;
+    height: 96px !important;
+    top: -8px !important;
+    right: -6px !important;
+  }
+
+  .value-badge span:nth-child(1) {
+    font-size: 12px !important;
+  }
+
+  .value-badge span:nth-child(2) {
+    font-size: 24px !important;
+  }
+
+  .value-badge span:nth-child(3) {
+    font-size: 14px !important;
+  }
+
+  /* Price rows on the hero card */
+  .menu-row {
+    font-size: 17px !important;
+    gap: 6px !important;
   }
 }
