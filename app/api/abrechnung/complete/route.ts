@@ -4,7 +4,7 @@ import { join, resolve, sep } from "node:path";
 import { typLabel, formatBytes, type AbrechnungTyp } from "@/app/lib/abrechnung";
 import { sign, verify, type UploadSession } from "@/app/lib/uploadSigning";
 
-const uploadsDir = () => resolve(process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads"));
+const uploadsDir = () => resolve(/*turbopackIgnore: true*/ process.env.UPLOAD_DIR ?? join(/*turbopackIgnore: true*/ process.cwd(), "uploads"));
 
 const DOWNLOAD_LINK_TTL = 30 * 24 * 60 * 60 * 1000;
 
@@ -117,8 +117,8 @@ export async function POST(request: NextRequest) {
     const invalid: string[] = [];
 
     for (const f of session.files) {
-      const filePath = join(base, f.pathname);
-      if (!resolve(filePath).startsWith(base + sep)) continue;
+      const filePath = join(/*turbopackIgnore: true*/ base, f.pathname);
+      if (!resolve(/*turbopackIgnore: true*/ filePath).startsWith(base + sep)) continue;
 
       const header = await readHeader(filePath);
       if (!header) {

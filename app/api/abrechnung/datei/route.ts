@@ -4,7 +4,7 @@ import { join, resolve, basename, sep } from "node:path";
 import { contentTypeFor } from "@/app/lib/abrechnung";
 import { verify } from "@/app/lib/uploadSigning";
 
-const uploadsDir = () => resolve(process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads"));
+const uploadsDir = () => resolve(/*turbopackIgnore: true*/ process.env.UPLOAD_DIR ?? join(/*turbopackIgnore: true*/ process.cwd(), "uploads"));
 
 export async function GET(request: NextRequest) {
   const payload = verify<{ p: string }>(request.nextUrl.searchParams.get("t"));
@@ -13,9 +13,9 @@ export async function GET(request: NextRequest) {
   }
 
   const base = uploadsDir();
-  const filePath = join(base, payload.p);
+  const filePath = join(/*turbopackIgnore: true*/ base, payload.p);
 
-  if (!resolve(filePath).startsWith(base + sep)) {
+  if (!resolve(/*turbopackIgnore: true*/ filePath).startsWith(base + sep)) {
     return new NextResponse("Zugriff verweigert.", { status: 403 });
   }
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
   const fileName = basename(payload.p);
 
   try {
-    const buffer = await readFile(filePath);
+    const buffer = await readFile(/*turbopackIgnore: true*/ filePath);
     return new NextResponse(buffer, {
       headers: {
         "Content-Type": contentType,

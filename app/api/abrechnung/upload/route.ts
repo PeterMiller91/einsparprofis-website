@@ -4,7 +4,7 @@ import { join, resolve, sep } from "node:path";
 import { MAX_FILE_SIZE } from "@/app/lib/abrechnung";
 import { verify, type UploadTicket } from "@/app/lib/uploadSigning";
 
-const uploadsDir = () => resolve(process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads"));
+const uploadsDir = () => resolve(/*turbopackIgnore: true*/ process.env.UPLOAD_DIR ?? join(/*turbopackIgnore: true*/ process.cwd(), "uploads"));
 
 export async function POST(request: NextRequest) {
   let formData: FormData;
@@ -31,9 +31,9 @@ export async function POST(request: NextRequest) {
   }
 
   const base = uploadsDir();
-  const filePath = join(base, ticket.p);
+  const filePath = join(/*turbopackIgnore: true*/ base, ticket.p);
 
-  if (!resolve(filePath).startsWith(base + sep)) {
+  if (!resolve(/*turbopackIgnore: true*/ filePath).startsWith(base + sep)) {
     return NextResponse.json({ error: "Ungültiger Pfad" }, { status: 403 });
   }
 
