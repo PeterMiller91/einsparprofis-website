@@ -98,8 +98,8 @@ export async function POST(request: NextRequest) {
     if (!selectedTypen.includes(f.typ)) return bad(`Typ der Datei passt nicht zur Auswahl: ${f.name}`);
   }
 
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    console.error("BLOB_READ_WRITE_TOKEN missing. Connect a Vercel Blob store to the project.");
+  if (!process.env.UPLOAD_SIGNING_SECRET) {
+    console.error("UPLOAD_SIGNING_SECRET missing in environment variables.");
     return NextResponse.json({ error: "Upload ist gerade nicht verfügbar. Bitte später erneut versuchen." }, { status: 503 });
   }
 

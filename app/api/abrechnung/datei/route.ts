@@ -1,28 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
-import { issueSignedToken, presignUrl } from "@vercel/blob";
+import { readFile } from "node:fs/promises";
+import { join, resolve, basename, sep } from "node:path";
+import { contentTypeFor } from "@/app/lib/abrechnung";
 import { verify } from "@/app/lib/uploadSigning";
 
-// Download link from the Telegram notification. The files are private, so we
-// verify our own signature and redirect to a presigned Blob URL valid for 10 min.
-// Redirecting (instead of proxying) avoids the 4.5 MB response limit.
+const uploadsDir = () => resolve(process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads"));
+
 export async function GET(request: NextRequest) {
   const payload = verify<{ p: string }>(request.nextUrl.searchParams.get("t"));
   if (!payload || !payload.p.startsWith("abrechnungen/")) {
     return new NextResponse("Link ungültig oder abgelaufen.", { status: 403 });
   }
 
+  const base = uploadsDir();
+  const filePath = join(base, payload.p);
+
+  if (!resolve(filePath).startsWith(base + sep)) {
+    return new NextResponse("Zugriff verweigert.", { status: 403 });
+  }
+
+  const contentType = contentTypeFor(payload.p) ?? "application/octet-stream";
+  const fileName = basename(payload.p);
+
   try {
-    const validUntil = Date.now() + 10 * 60 * 1000;
-    const signedToken = await issueSignedToken({ pathname: payload.p, operations: ["get"], validUntil });
-    const { presignedUrl } = await presignUrl(signedToken, {
-      operation: "get",
-      pathname: payload.p,
-      access: "private",
-      validUntil,
+    const buffer = await readFile(filePath);
+    return new NextResponse(buffer, {
+      headers: {
+        "Content-Type": contentType,
+        "Content-Disposition": `attachment; filename="${encodeURIComponent(fileName)}"`,
+        "Content-Length": buffer.length.toString(),
+        "Cache-Control": "no-store",
+      },
     });
-    return NextResponse.redirect(presignedUrl, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("Download link error:", error);
+    console.error("Download error:", error);
     return new NextResponse("Datei nicht verfügbar.", { status: 404 });
   }
 }

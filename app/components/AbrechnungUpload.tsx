@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
 import {
   ABRECHNUNG_TYPEN,
   ACCEPT_ATTR,
@@ -53,6 +52,44 @@ const labelText: React.CSSProperties = { fontSize: "14px", fontWeight: 700, colo
 const errorText: React.CSSProperties = { fontSize: "14px", color: C.red };
 
 const STALL_TIMEOUT = 45_000;
+
+function uploadFile(
+  file: File,
+  ticket: string,
+  signal: AbortSignal,
+  onProgress: (loaded: number) => void
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("ticket", ticket);
+
+    xhr.upload.addEventListener("progress", (e) => {
+      if (e.lengthComputable) onProgress(e.loaded);
+    });
+
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve();
+      } else {
+        try {
+          reject(new Error(JSON.parse(xhr.responseText).error || "Upload fehlgeschlagen"));
+        } catch {
+          reject(new Error("Upload fehlgeschlagen"));
+        }
+      }
+    });
+
+    xhr.addEventListener("error", () => reject(new Error("Verbindungsfehler")));
+    xhr.addEventListener("abort", () => reject(new Error("Upload abgebrochen")));
+
+    signal.addEventListener("abort", () => xhr.abort());
+
+    xhr.open("POST", "/api/abrechnung/upload");
+    xhr.send(fd);
+  });
+}
 
 const fileKey = (f: File) => `${f.name}|${f.size}|${f.lastModified}`;
 
@@ -200,22 +237,13 @@ export default function AbrechnungUpload({ initialVorname = "", initialNachname 
         if (!isNewSession && item.status === "fertig") continue;
         const target = data.files[index];
         patchItem(item.id, { status: "laedt", loaded: 0, error: undefined });
-        // The SDK retries for many minutes on a dead connection – give up after 45 s without progress
         const controller = new AbortController();
         let watchdog = setTimeout(() => controller.abort(), STALL_TIMEOUT);
         try {
-          await upload(target.pathname, item.file, {
-            access: "private",
-            handleUploadUrl: "/api/abrechnung/upload",
-            clientPayload: target.ticket,
-            contentType: target.contentType,
-            multipart: item.file.size > 8 * 1024 * 1024,
-            abortSignal: controller.signal,
-            onUploadProgress: ({ loaded }) => {
-              clearTimeout(watchdog);
-              watchdog = setTimeout(() => controller.abort(), STALL_TIMEOUT);
-              patchItem(item.id, { loaded });
-            },
+          await uploadFile(item.file, target.ticket, controller.signal, (loaded) => {
+            clearTimeout(watchdog);
+            watchdog = setTimeout(() => controller.abort(), STALL_TIMEOUT);
+            patchItem(item.id, { loaded });
           });
           patchItem(item.id, { status: "fertig", loaded: item.file.size });
         } catch (err) {

@@ -1,40 +1,49 @@
-import { NextResponse } from "next/server";
-import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
+import { NextRequest, NextResponse } from "next/server";
+import { writeFile, mkdir } from "node:fs/promises";
+import { join, resolve, sep } from "node:path";
 import { MAX_FILE_SIZE } from "@/app/lib/abrechnung";
 import { verify, type UploadTicket } from "@/app/lib/uploadSigning";
 
-// Issues short-lived client tokens so the browser uploads straight to Vercel Blob.
-// This bypasses the 4.5 MB request body limit of Vercel Functions.
-export async function POST(request: Request) {
-  let body: HandleUploadBody;
+const uploadsDir = () => resolve(process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads"));
+
+export async function POST(request: NextRequest) {
+  let formData: FormData;
   try {
-    body = (await request.json()) as HandleUploadBody;
+    formData = await request.formData();
   } catch {
     return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
   }
 
+  const ticketRaw = formData.get("ticket");
+  const file = formData.get("file");
+
+  if (!(file instanceof File)) {
+    return NextResponse.json({ error: "Keine Datei erhalten" }, { status: 400 });
+  }
+
+  const ticket = verify<UploadTicket>(ticketRaw);
+  if (!ticket) {
+    return NextResponse.json({ error: "Upload nicht autorisiert" }, { status: 403 });
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    return NextResponse.json({ error: "Datei zu groß (max. 20 MB)" }, { status: 413 });
+  }
+
+  const base = uploadsDir();
+  const filePath = join(base, ticket.p);
+
+  if (!resolve(filePath).startsWith(base + sep)) {
+    return NextResponse.json({ error: "Ungültiger Pfad" }, { status: 403 });
+  }
+
   try {
-    const result = await handleUpload({
-      body,
-      request,
-      onBeforeGenerateToken: async (pathname, clientPayload) => {
-        // Only pathnames issued by /api/abrechnung/session may be written
-        const ticket = verify<UploadTicket>(clientPayload);
-        if (!ticket || ticket.p !== pathname) {
-          throw new Error("Upload nicht autorisiert");
-        }
-        return {
-          allowedContentTypes: [ticket.t],
-          maximumSizeInBytes: MAX_FILE_SIZE,
-          addRandomSuffix: false,
-          allowOverwrite: false,
-          validUntil: Date.now() + 30 * 60 * 1000,
-        };
-      },
-    });
-    return NextResponse.json(result);
+    await mkdir(join(filePath, ".."), { recursive: true });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    await writeFile(filePath, buffer);
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Blob client token error:", error);
-    return NextResponse.json({ error: "Upload nicht möglich" }, { status: 400 });
+    console.error("File write error:", error);
+    return NextResponse.json({ error: "Upload fehlgeschlagen" }, { status: 500 });
   }
 }

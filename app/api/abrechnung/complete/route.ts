@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { BlobNotFoundError, del, get, head, put } from "@vercel/blob";
+import { open, stat, unlink, writeFile } from "node:fs/promises";
+import { join, resolve, sep } from "node:path";
 import { typLabel, formatBytes, type AbrechnungTyp } from "@/app/lib/abrechnung";
 import { sign, verify, type UploadSession } from "@/app/lib/uploadSigning";
 
-const DOWNLOAD_LINK_TTL = 30 * 24 * 60 * 60 * 1000; // links in Telegram stay valid for 30 days
+const uploadsDir = () => resolve(process.env.UPLOAD_DIR ?? join(process.cwd(), "uploads"));
+
+const DOWNLOAD_LINK_TTL = 30 * 24 * 60 * 60 * 1000;
 
 const escapeHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-// Rejects files whose content doesn't match the extension (e.g. renamed .exe -> .pdf)
 function matchesMagicBytes(bytes: Uint8Array, pathname: string) {
   const ascii = (from: number, to: number) => String.fromCharCode(...bytes.slice(from, to));
   const ext = pathname.split(".").pop()?.toLowerCase();
@@ -29,22 +31,27 @@ function matchesMagicBytes(bytes: Uint8Array, pathname: string) {
   }
 }
 
-async function readHeader(pathname: string) {
-  const result = await get(pathname, { access: "private", useCache: false });
-  if (!result || result.statusCode !== 200) return null;
-  const reader = result.stream.getReader();
-  const { value } = await reader.read();
-  await reader.cancel();
-  return value ?? new Uint8Array();
+async function readHeader(filePath: string): Promise<Uint8Array | null> {
+  try {
+    const fh = await open(filePath, "r");
+    try {
+      const buffer = Buffer.alloc(12);
+      const { bytesRead } = await fh.read(buffer, 0, 12, 0);
+      return buffer.subarray(0, bytesRead);
+    } finally {
+      await fh.close();
+    }
+  } catch {
+    return null;
+  }
 }
 
-async function exists(pathname: string) {
+async function exists(filePath: string): Promise<boolean> {
   try {
-    await head(pathname);
+    await stat(filePath);
     return true;
-  } catch (error) {
-    if (error instanceof BlobNotFoundError) return false;
-    throw error;
+  } catch {
+    return false;
   }
 }
 
@@ -97,22 +104,28 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Upload-Sitzung abgelaufen. Bitte erneut hochladen." }, { status: 400 });
   }
 
+  const base = uploadsDir();
+
   try {
-    const metaPath = `${session.folder}/_angaben.json`;
-    // Idempotent: a repeated call (e.g. double click, retry) must not notify twice
+    const metaPath = join(base, session.folder, "_angaben.json");
+
     if (await exists(metaPath)) {
       return NextResponse.json({ success: true, files: session.files.map((f) => f.fileName) });
     }
 
     const missing: string[] = [];
     const invalid: string[] = [];
+
     for (const f of session.files) {
-      const header = await readHeader(f.pathname);
+      const filePath = join(base, f.pathname);
+      if (!resolve(filePath).startsWith(base + sep)) continue;
+
+      const header = await readHeader(filePath);
       if (!header) {
         missing.push(f.originalName);
       } else if (!matchesMagicBytes(header, f.pathname)) {
         invalid.push(f.originalName);
-        await del(f.pathname);
+        await unlink(filePath).catch(() => null);
       }
     }
 
@@ -126,18 +139,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Keep the form data next to the files for the archive
-    await put(metaPath, JSON.stringify({ ...session, completedAt: new Date().toISOString() }, null, 2), {
-      access: "private",
-      contentType: "application/json",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-    });
+    await writeFile(
+      metaPath,
+      JSON.stringify({ ...session, completedAt: new Date().toISOString() }, null, 2),
+      "utf8"
+    );
 
     try {
       await notifyTelegram(session, request.nextUrl.origin);
     } catch (telegramError) {
-      // Files are stored safely; notification failure must not fail the upload
       console.error("Failed to send upload notification to Telegram:", telegramError);
     }
 
