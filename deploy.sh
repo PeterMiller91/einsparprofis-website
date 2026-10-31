@@ -4,7 +4,7 @@ set -e
 echo "==> Installing dependencies..."
 npm ci --include=dev
 
-echo "==> Building application..."
+echo "==> Building static export..."
 npm run build
 
-echo "==> Done."
+echo "==> Done. Serve files from the 'out/' directory."

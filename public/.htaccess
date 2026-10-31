@@ -1,0 +1,42 @@
+Options -Indexes
+DirectoryIndex index.html
+
+# ── Security headers ────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# ── Redirects ────────────────────────────────────────────────────────────────
+Redirect 301 /datenschutz /datenschutz.html
+Redirect 301 /impressum   /impressum.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # ── Gaststaette subdomain → /gaststaette/ ─────────────────────────────
+    RewriteCond %{HTTP_HOST} ^gaststaette\. [NC]
+    RewriteCond %{REQUEST_URI} ^/$
+    RewriteRule ^ /gaststaette/index.html [L]
+
+    # ── API: remove .php extension ────────────────────────────────────────
+    RewriteRule ^api/lead$                    api/lead.php                    [L,QSA]
+    RewriteRule ^api/abrechnung/session$      api/abrechnung/session.php      [L,QSA]
+    RewriteRule ^api/abrechnung/upload$       api/abrechnung/upload.php       [L,QSA]
+    RewriteRule ^api/abrechnung/complete$     api/abrechnung/complete.php     [L,QSA]
+    RewriteRule ^api/abrechnung/datei$        api/abrechnung/datei.php        [L,QSA]
+
+    # ── Next.js static export: clean URLs ────────────────────────────────
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !\.[a-z0-9]+$ [NC]
+    RewriteRule ^(.+)$ $1/index.html [L]
+</IfModule>
+
+# ── PHP upload limit ──────────────────────────────────────────────────────────
+<IfModule mod_php.c>
+    php_value upload_max_filesize 22M
+    php_value post_max_size 25M
+</IfModule>
