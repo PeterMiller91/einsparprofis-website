@@ -5,9 +5,9 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 // used as an open file dump, and they sign the download links sent to Telegram.
 
 function secret() {
-  const s = process.env.UPLOAD_SIGNING_SECRET || process.env.BLOB_READ_WRITE_TOKEN;
+  const s = process.env.UPLOAD_SIGNING_SECRET;
   if (!s) {
-    throw new Error("UPLOAD_SIGNING_SECRET (oder BLOB_READ_WRITE_TOKEN) fehlt in den Umgebungsvariablen.");
+    throw new Error("UPLOAD_SIGNING_SECRET fehlt in den Umgebungsvariablen.");
   }
   return s;
 }

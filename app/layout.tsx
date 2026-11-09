@@ -44,7 +44,6 @@ export const metadata: Metadata = {
     telephone: false,
     address: false,
   },
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   alternates: {
     canonical: "https://einsparprofis.de",
   },

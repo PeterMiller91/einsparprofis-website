@@ -38,6 +38,15 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local file uploads (stored on server, never in git)
+/uploads
+
+# local PHP config with secrets (created on server)
+**/config.local.php
+
+# Next.js static export output
+/out
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
