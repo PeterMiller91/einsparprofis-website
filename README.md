@@ -72,3 +72,15 @@ Die Dateien sind außerdem im Vercel-Dashboard unter **Storage → Blob** einseh
 - Ein `?src=…` in der URL überschreibt die Quelle, z. B. `einsparprofis.de/?src=facebook`. Die Quelle steht in der Telegram-Nachricht und in Google Sheets.
 - Plätze, Frist und Beträge für beide Seiten stehen zentral in `app/lib/angebot.ts`.
 - Die Subdomain wird in `proxy.ts` auf `/gaststaette` umgeschrieben. Dafür in Vercel unter **Settings → Domains** `gaststaette.einsparprofis.de` hinzufügen und beim Domain-Anbieter einen CNAME-Eintrag `gaststaette` → `cname.vercel-dns.com` anlegen.
+
+## Wärmepumpen-Landingpage (`/waermepumpe`)
+
+Lead-Seite für Wärmepumpen: Quiz mit 5 Fragen, danach die mögliche KfW-Förderung und ein Kontaktformular mit Telefon-Opt-in.
+
+- **Zahlen** (Plätze, Garantie, Förderwerte, Klimabonus-Frist) stehen in `app/lib/waermepumpe.ts`. Förderwerte vor Kampagnen auf kfw.de/458 prüfen. `klimabonusEnde: null` blendet den Hinweis auf das Ende des Klimabonus aus.
+- **Endpunkt:** `public/api/waermepumpe-lead.php` (`/api/waermepumpe-lead`):
+  - prüft alle Angaben und die Telefon-Einwilligung,
+  - schickt eine Telegram-Nachricht,
+  - hängt eine Zeile an den Google-Sheets-Tab **`Waermepumpe`** an. Den Tab einmalig anlegen, Spalten: Zeit, Name, PLZ, Telefon, Rückruf, Heizung, Haustyp, Baujahr, Eigentum, Einkommen, Förderung, Telefon-Einwilligung, Weitergabe, Version, Quelle.
+- **Einwilligungsnachweis (§ 7 UWG):** Jede Telefon-Einwilligung wird mit Wortlaut, Version, Zeit, IP und Browser in `UPLOAD_DIR/einwilligungen/JJJJ-MM.jsonl` protokolliert, außerhalb des Webroots.
+- **Einwilligungstext ändern:** Den Text in `app/lib/waermepumpe.ts` **und** `public/api/waermepumpe-lead.php` identisch ändern und die Version (`wp-…`) in beiden Dateien erhöhen. Ältere Nachweise bleiben so eindeutig zuordenbar.

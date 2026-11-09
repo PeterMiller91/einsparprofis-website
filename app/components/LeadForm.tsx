@@ -3,27 +3,7 @@
 import { useState } from "react";
 import styles from "../landing.module.css";
 import { ANGEBOT, freiePlaetze } from "../lib/angebot";
-
-// Same rules as /api/lead, so the server never rejects what the form accepted
-const isNameValid = (name: string) => /^[a-zA-ZäöüßÄÖÜ\s-]{2,}$/.test(name.trim());
-const isPlzValid = (plz: string) => /^[1-9]\d{4}$/.test(plz);
-
-/** "0151 1234567", "0049…", "49…" or "+49…" -> "+491511234567" */
-export function normalizePhone(input: string) {
-  const digits = input.replace(/\D/g, "");
-  if (!digits) return "";
-  if (input.trim().startsWith("+")) return `+${digits}`;
-  if (digits.startsWith("00")) return `+${digits.slice(2)}`;
-  if (digits.startsWith("0")) return `+49${digits.slice(1)}`;
-  if (digits.startsWith("49")) return `+${digits}`;
-  return `+49${digits}`;
-}
-
-const isPhoneValid = (tel: string) => {
-  const normalized = normalizePhone(tel);
-  const digits = normalized.replace(/\D/g, "");
-  return normalized.startsWith("+49") && digits.length >= 11 && digits.length <= 13;
-};
+import { isNameValid, isPhoneValid, isPlzValid, normalizePhone } from "../lib/leadValidation";
 
 interface Props {
   /** Estimate from the Spar-Rechner, sent along to Telegram */
