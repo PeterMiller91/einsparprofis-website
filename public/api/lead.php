@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../abrechnung/config.php';
+require_once __DIR__ . '/abrechnung/config.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -92,32 +92,3 @@ if (GOOGLE_SHEETS_ID && GOOGLE_SHEETS_CREDS) {
 }
 
 json_out(['success' => true, 'message' => 'Lead erfolgreich gespeichert'], 201);
-
-function google_access_token(array $creds): ?string {
-    $now    = time();
-    $header  = b64u_encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT']));
-    $payload = b64u_encode(json_encode([
-        'iss'   => $creds['client_email'],
-        'scope' => 'https://www.googleapis.com/auth/spreadsheets',
-        'aud'   => 'https://oauth2.googleapis.com/token',
-        'iat'   => $now,
-        'exp'   => $now + 3600,
-    ]));
-    $signingInput = "$header.$payload";
-    $key = openssl_pkey_get_private($creds['private_key']);
-    if (!$key) return null;
-    openssl_sign($signingInput, $signature, $key, 'SHA256');
-    $jwt = $signingInput . '.' . b64u_encode($signature);
-
-    $ch = curl_init('https://oauth2.googleapis.com/token');
-    curl_setopt_array($ch, [
-        CURLOPT_POST           => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POSTFIELDS     => http_build_query(['grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'assertion' => $jwt]),
-        CURLOPT_TIMEOUT        => 10,
-    ]);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    $data = json_decode($response, true);
-    return $data['access_token'] ?? null;
-}

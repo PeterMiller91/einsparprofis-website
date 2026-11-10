@@ -12,7 +12,7 @@ export const ANGEBOT = {
 
 export const freiePlaetze = ANGEBOT.plaetze - ANGEBOT.belegt;
 
-export const eur = (n: number) => n.toLocaleString("de-DE") + " €";
+export const eur = (n: number) => n.toLocaleString("de-DE") + "\u00a0€"; // no line break before €
 
 /** Rough yearly savings estimate used by the Spar-Rechner (15 % energy, 20 % insurance). */
 export const schaetzeErsparnis = (stromMonat: number, gasMonat: number, versJahr: number) =>

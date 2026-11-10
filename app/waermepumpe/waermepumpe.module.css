@@ -1,0 +1,269 @@
+/* Wärmepumpen page – additions to landing.module.css */
+
+.quizCard {
+  scroll-margin-top: 16px;
+  max-width: 560px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.progressHead {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4e4262;
+}
+
+.progress {
+  height: 8px;
+  background: #ffe9d6;
+  border-radius: 999px;
+  margin: 8px 0 18px;
+  overflow: hidden;
+}
+
+.progress div {
+  height: 100%;
+  background: #db2c14;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.question {
+  font-family: var(--font-bricolage);
+  font-weight: 800;
+  font-size: 21px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+
+.options {
+  display: grid;
+  gap: 9px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  border: 2px solid #e6d9c4;
+  border-radius: 16px;
+  padding: 15px 14px;
+  font: inherit;
+  font-weight: 700;
+  font-size: 16px;
+  color: #1c1233;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.option span {
+  font-size: 24px;
+  width: 30px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.option:hover {
+  border-color: #1c1233;
+}
+
+.option:active {
+  transform: scale(0.98);
+}
+
+.selected {
+  border-color: #1c1233;
+  background: #ffe9d6;
+}
+
+.back {
+  background: none;
+  border: none;
+  font: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  color: #4e4262;
+  cursor: pointer;
+  padding: 12px 0 0;
+  align-self: flex-start;
+}
+
+/* Result */
+.result {
+  text-align: center;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid #f0e2cc;
+}
+
+.resultEyebrow {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1e9e5a;
+  margin-bottom: 4px;
+}
+
+.resultTitle {
+  display: block;
+  font-family: var(--font-bricolage);
+  font-weight: 800;
+  font-size: 20px;
+}
+
+.resultValue {
+  display: block;
+  font-family: var(--font-bricolage);
+  font-weight: 800;
+  font-size: clamp(40px, 12vw, 56px);
+  line-height: 1;
+  color: #1e9e5a;
+  margin: 8px 0 12px;
+  letter-spacing: -0.03em;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.chips span {
+  background: #e3f6ea;
+  color: #14683c;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.resultNote {
+  font-size: 14px;
+  color: #4e4262;
+  line-height: 1.45;
+}
+
+.select {
+  width: 100%;
+  border: 2px solid #e6d9c4;
+  border-radius: 12px;
+  padding: 13px 10px;
+  font: inherit;
+  font-size: 17px;
+  color: #1c1233;
+  background: #fff;
+}
+
+/* The phone opt-in is the key consent – make it stand out */
+.optIn {
+  background: #fff7ea;
+  border: 2px solid #1c1233;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.optIn b {
+  font-weight: 600;
+  color: #1c1233;
+}
+
+.optInError {
+  border-color: #db2c14;
+}
+
+.privacy {
+  font-size: 12px;
+  color: #4e4262;
+}
+
+.privacy a {
+  color: #db2c14;
+  text-decoration: underline;
+}
+
+.summary {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #4e4262;
+  text-align: center;
+}
+
+/* Hero facts */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 22px;
+  text-align: center;
+}
+
+.stat {
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px 6px;
+}
+
+.stat strong {
+  display: block;
+  font-family: var(--font-bricolage);
+  font-weight: 800;
+  font-size: clamp(19px, 5.6vw, 28px);
+  color: #db2c14;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.stat span {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  display: block;
+}
+
+.quizSteps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.quizSteps span {
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+@media (min-width: 900px) {
+  .stat span {
+    font-size: 13px;
+  }
+}
+
+.yellowBtn {
+  background: #ffd60a;
+  color: #1c1233;
+}
+
+.yellowBtn:hover {
+  background: #fff7ea;
+  color: #1c1233;
+}
+
+@media (min-width: 900px) {
+  .steps4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

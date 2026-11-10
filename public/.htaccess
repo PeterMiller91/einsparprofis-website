@@ -23,6 +23,7 @@ Redirect 301 /impressum   /impressum.html
 
     # ── API: remove .php extension ────────────────────────────────────────
     RewriteRule ^api/lead$                    api/lead.php                    [L,QSA]
+    RewriteRule ^api/waermepumpe-lead$        api/waermepumpe-lead.php        [L,QSA]
     RewriteRule ^api/abrechnung/session$      api/abrechnung/session.php      [L,QSA]
     RewriteRule ^api/abrechnung/upload$       api/abrechnung/upload.php       [L,QSA]
     RewriteRule ^api/abrechnung/complete$     api/abrechnung/complete.php     [L,QSA]
