@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import base from "../landing.module.css";
 import styles from "./waermepumpe.module.css";
 import { isNameValid, isPhoneValid, isPlzValid, normalizePhone } from "../lib/leadValidation";
 import {
   CONSENT_TELEFON,
   CONSENT_VERSION,
-  CONSENT_WEITERGABE,
   QUIZ,
   WP,
   berechneFoerderung,
@@ -25,11 +25,10 @@ export default function WaermepumpeQuiz() {
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [form, setForm] = useState({ vorname: "", nachname: "", plz: "", tel: "", rueckruf: "Egal", firma: "" });
   const [consentTel, setConsentTel] = useState(false);
-  const [consentWeitergabe, setConsentWeitergabe] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const top = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const total = QUIZ.length;
   const foerderung = berechneFoerderung(answers);
@@ -79,14 +78,14 @@ export default function WaermepumpeQuiz() {
           answers,
           foerderung: `${foerderung.prozent} % · bis ${eur(foerderung.euro).replace("\u00a0", " ")}`,
           consentTelefon: consentTel,
-          consentWeitergabe,
           consentVersion: CONSENT_VERSION,
           src: new URLSearchParams(window.location.search).get("src") || "waermepumpe",
         }),
       });
       if (response.ok) {
-        setSent(true);
-        requestAnimationFrame(() => top.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+        // Own thank-you page: lets ad platforms count the conversion
+        router.push(`/waermepumpe/danke?${new URLSearchParams({ vorname: form.vorname.trim(), nachname: form.nachname.trim(), rueckruf: form.rueckruf })}`);
+        return;
       } else {
         const data = await response.json().catch(() => ({}));
         setErrors({ submit: data.error || "Fehler beim Absenden. Bitte versuchen Sie es erneut." });
@@ -97,25 +96,6 @@ export default function WaermepumpeQuiz() {
       setLoading(false);
     }
   };
-
-  if (sent) {
-    const upload = `/abrechnung-hochladen?${new URLSearchParams({ vorname: form.vorname.trim(), nachname: form.nachname.trim(), src: "waermepumpe" })}`;
-    return (
-      <div ref={top} className={`${base.card} ${base.shadowCard} ${styles.quizCard}`} role="status">
-        <div className={base.success}>
-          <span className={base.successIcon}>✓</span>
-          <h3>Danke, {form.vorname.trim()}! Wir rufen Sie innerhalb von 24 Stunden an.</h3>
-          <p className={base.lead}>
-            {form.rueckruf !== "Egal" ? `Am besten ${form.rueckruf.toLowerCase()} – notiert. ` : ""}
-            Damit wir Ihr Haus schon vorab einschätzen können: Schicken Sie uns ein Foto Ihrer letzten Heizkostenabrechnung.
-          </p>
-          <a href={upload} className={base.btn}>
-            📷 Abrechnung senden →
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   if (step < total) {
     const q = QUIZ[step];
@@ -262,15 +242,8 @@ export default function WaermepumpeQuiz() {
         </label>
         {errors.consentTel && <span className={base.error}>{errors.consentTel}</span>}
 
-        <label className={base.consent}>
-          <input type="checkbox" checked={consentWeitergabe} onChange={(e) => setConsentWeitergabe(e.target.checked)} />
-          <span>
-            {CONSENT_WEITERGABE} <i>(optional – sonst fragen wir Sie vorher.)</i>
-          </span>
-        </label>
-
         <p className={styles.privacy}>
-          Ihre Angaben verwenden wir nur für Ihren Wärmepumpen-Check. Details in der{" "}
+          Ihre Angaben verwenden wir nur für Ihren Wärmepumpen-Check. An einen Fachbetrieb geben wir sie nur weiter, wenn Sie im Gespräch ausdrücklich zustimmen. Details in der{" "}
           <a href="/datenschutz.html" target="_blank">
             Datenschutzerklärung
           </a>
