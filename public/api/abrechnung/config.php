@@ -1,12 +1,17 @@
 <?php
 // Load local config first (created on server, never in git).
-// 1) <domain>/private/config.php – outside the web root, survives every deploy
-// 2) config.local.php next to this file (legacy)
-$privateConfig = !empty($_SERVER['DOCUMENT_ROOT'])
-    ? dirname(rtrim($_SERVER['DOCUMENT_ROOT'], '/')) . '/private/config.php'
-    : '';
-if ($privateConfig && is_file($privateConfig)) {
-    require_once $privateConfig;
+// Searched in this order, first match wins:
+// 1) <docroot>/_private/config.php  (inside open_basedir, blocked by .htaccess)
+// 2) <docroot>/../private/config.php (outside the web root, if open_basedir allows)
+// 3) config.local.php next to this file (legacy)
+$docRoot = rtrim($_SERVER['DOCUMENT_ROOT'] ?? '', '/');
+if ($docRoot !== '') {
+    foreach ([$docRoot . '/_private/config.php', dirname($docRoot) . '/private/config.php'] as $privateConfig) {
+        if (@is_file($privateConfig)) {
+            require_once $privateConfig;
+            break;
+        }
+    }
 }
 $localConfig = __DIR__ . '/config.local.php';
 if (file_exists($localConfig)) {
