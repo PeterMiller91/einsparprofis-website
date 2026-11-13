@@ -68,10 +68,25 @@ Die Dateien sind außerdem im Vercel-Dashboard unter **Storage → Blob** einseh
 | --- | --- | --- | --- |
 | `einsparprofis.de` | `app/page.tsx` | allgemein (Werbung, Social, Empfehlungen) | `allgemein` |
 | `gaststaette.einsparprofis.de` (auch `/gaststaette`) | `app/gaststaette/page.tsx` | Aufsteller in Gaststätten | `gaststaette` |
+| `einsparprofis.de/waermepumpe` | `app/waermepumpe/` | Hausbesitzer mit Gas- oder Ölheizung | `waermepumpe` |
 
-- Ein `?src=…` in der URL überschreibt die Quelle, z. B. `einsparprofis.de/?src=facebook`. Die Quelle steht in der Telegram-Nachricht und in Google Sheets.
-- Plätze, Frist und Beträge für beide Seiten stehen zentral in `app/lib/angebot.ts`.
-- Die Subdomain wird in `proxy.ts` auf `/gaststaette` umgeschrieben. Dafür in Vercel unter **Settings → Domains** `gaststaette.einsparprofis.de` hinzufügen und beim Domain-Anbieter einen CNAME-Eintrag `gaststaette` → `cname.vercel-dns.com` anlegen.
+Startseite und Gaststätten-Seite sind dieselbe Komponente (`app/components/HaushaltsLanding.tsx`) mit unterschiedlicher Ansprache.
+
+### Lead-Funnel (`app/components/SparFunnel.tsx`)
+
+1. Bereiche wählen (Strom, Gas, Versicherungen)
+2. Kosten schätzen, die mögliche Ersparnis erscheint sofort
+3. Kontaktdaten mit Einwilligung in Telefon- und WhatsApp-Kontakt
+4. Bestätigung mit Rechnungs-Upload und WhatsApp-Button
+
+- Der Lead geht an `public/api/lead.php`: Telegram, Google Sheets und Einwilligungsnachweis in `UPLOAD_DIR/einwilligungen/JJJJ-MM.jsonl`.
+- Ein `?src=…` in der URL überschreibt die Quelle, z. B. `einsparprofis.de/?src=facebook`.
+- **Zahlen und Kontaktdaten** stehen in `app/lib/angebot.ts`:
+  - `belegt`: echte Zahl der vergebenen Checks im Monat oder `null`. Bei `null` zeigt die Seite keinen Zähler.
+  - `frist` / `fristIso`: Frist für den Preis-Wächter-Bonus. Nach dem Datum verschwinden Bonus und Fristhinweise von selbst.
+  - `whatsapp`, `telefon`, `email`.
+- **Einwilligungstext ändern:** in `app/lib/angebot.ts` und `public/api/lead.php` identisch ändern und die Version (`hc-…`) in beiden Dateien erhöhen.
+- Die FAQ stehen einmal in `app/lib/angebot.ts` und werden für die Seite und für die Suchmaschinen-Angaben (`StructuredData.tsx`) verwendet.
 
 ## Wärmepumpen-Landingpage (`/waermepumpe`)
 

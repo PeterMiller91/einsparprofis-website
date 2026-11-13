@@ -72,28 +72,16 @@ $name       = "$vorname $nachname";
 
 // 1) Proof of consent (UWG §7: phone advertising needs prior express consent).
 //    Stored outside the web root next to the uploads; this must not fail silently.
-$consentDir = UPLOAD_DIR . '/einwilligungen';
-$logged = false;
-if (is_dir($consentDir) || @mkdir($consentDir, 0750, true)) {
-    $entry = [
-        'zeit'       => $now->format(DATE_ATOM),
-        'name'       => $name,
-        'telefon'    => $tel,
-        'plz'        => $plz,
-        'quelle'     => $src,
-        'version'    => WP_CONSENT_VERSION,
-        'telefon_einwilligung' => WP_CONSENT_TELEFON,
-        'weitergabe_einwilligung' => $weitergabe ? WP_CONSENT_WEITERGABE : null,
-        'ip'         => $_SERVER['REMOTE_ADDR'] ?? '',
-        'user_agent' => mb_substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 300),
-    ];
-    $logged = file_put_contents(
-        $consentDir . '/' . $now->format('Y-m') . '.jsonl',
-        json_encode($entry, JSON_UNESCAPED_UNICODE) . "\n",
-        FILE_APPEND | LOCK_EX
-    ) !== false;
-}
-if (!$logged) error_log('Waermepumpe: consent log could not be written to ' . $consentDir);
+$logged = log_consent('waermepumpe', [
+    'zeit'       => $now->format(DATE_ATOM),
+    'name'       => $name,
+    'telefon'    => $tel,
+    'plz'        => $plz,
+    'quelle'     => $src,
+    'version'    => WP_CONSENT_VERSION,
+    'telefon_einwilligung' => WP_CONSENT_TELEFON,
+    'weitergabe_einwilligung' => $weitergabe ? WP_CONSENT_WEITERGABE : null,
+]);
 
 // 2) Telegram
 if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {

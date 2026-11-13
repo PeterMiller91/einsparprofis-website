@@ -1,5 +1,10 @@
 <?php
+// Haushalts-Check lead: Telegram + Google Sheets + proof of consent
 require_once __DIR__ . '/abrechnung/config.php';
+
+// Consent text shown in app/lib/angebot.ts – logged verbatim, keep both in sync
+const LEAD_CONSENT_VERSION = 'hc-2026-11';
+const LEAD_CONSENT = 'Ich stimme zu, dass die Einsparprofis (Daniel Schultes) mich zu meinem Haushalts-Check telefonisch und per WhatsApp unter der angegebenen Nummer kontaktieren. Diese Einwilligung kann ich jederzeit per E-Mail an kontakt@einsparprofis.de widerrufen.';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -8,14 +13,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $body = json_decode(file_get_contents('php://input'), true);
-if (!$body) json_out(['error' => 'Ungültige Anfrage'], 400);
+if (!is_array($body)) json_out(['error' => 'Ungültige Anfrage'], 400);
+
+// Honeypot: only bots fill the hidden field – pretend success
+if (trim((string) ($body['firma'] ?? '')) !== '') {
+    json_out(['success' => true], 201);
+}
 
 $name      = trim($body['name']     ?? '');
 $plz       = trim($body['plz']      ?? '');
 $tel       = trim($body['tel']      ?? '');
-$schaetzung = $body['schaetzung']   ?? null;
-$src        = $body['src']          ?? 'Website';
-$consent    = $body['consent']      ?? false;
+$schaetzung = mb_substr((string) ($body['schaetzung'] ?? ''), 0, 80);
+$src        = mb_substr((string) ($body['src'] ?? 'Website'), 0, 60);
+$consent    = ($body['consent'] ?? false) === true;
 
 if (!$name || !$plz || !$tel || !$consent) {
     json_out(['error' => 'Pflichtfelder erforderlich'], 400);
@@ -39,7 +49,23 @@ if (!preg_match('/^[\pL\s\-]{2,}/u', $name)) {
     json_out(['error' => 'Name ungültig (mind. 2 Buchstaben)'], 400);
 }
 
-$timestamp = (new DateTimeImmutable())->setTimezone(new DateTimeZone('Europe/Berlin'))->format('d.m.Y H:i:s');
+if (($body['consentVersion'] ?? '') !== LEAD_CONSENT_VERSION) {
+    json_out(['error' => 'Bitte laden Sie die Seite neu und senden Sie das Formular erneut.'], 400);
+}
+
+$now       = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
+$timestamp = $now->format('d.m.Y H:i:s');
+
+// Proof of consent (UWG §7), stored outside the web root next to the uploads
+$logged = log_consent('haushalts-check', [
+    'zeit'         => $now->format(DATE_ATOM),
+    'name'         => $name,
+    'telefon'      => $tel,
+    'plz'          => $plz,
+    'quelle'       => $src,
+    'version'      => LEAD_CONSENT_VERSION,
+    'einwilligung' => LEAD_CONSENT,
+]);
 
 // Telegram
 if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
@@ -49,6 +75,7 @@ if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
         . "📞 <b>Telefon:</b> " . htmlspecialchars($tel) . "\n"
         . "💰 <b>Schätzung:</b> " . htmlspecialchars($schaetzung ?: 'Nicht angegeben') . "\n"
         . "📊 <b>Quelle:</b> " . htmlspecialchars($src) . "\n"
+        . "✅ Kontakt-Einwilligung erteilt (" . LEAD_CONSENT_VERSION . ")" . ($logged ? '' : ' ⚠️ Protokoll fehlgeschlagen') . "\n"
         . "⏰ <b>Zeit:</b> " . $timestamp;
 
     $ch = curl_init('https://api.telegram.org/bot' . TELEGRAM_BOT_TOKEN . '/sendMessage');

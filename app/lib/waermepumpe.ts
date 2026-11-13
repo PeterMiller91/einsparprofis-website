@@ -4,12 +4,14 @@
 
 export const WP = {
   plaetze: 15, // Wärmepumpen-Checks pro Monat
-  belegt: 9,
+  // Real number of checks taken this month, or null to hide the counter (see angebot.ts)
+  belegt: null as number | null,
   monat: "November",
   garantieTage: 14,
   garantieBetrag: 50,
   // Only true statements: set to null if the date is not confirmed
-  klimabonusEnde: "1.2.2027" as string | null,
+  // Not confirmed by KfW yet – set e.g. "1.2.2027" once it is
+  klimabonusEnde: null as string | null,
   foerderung: {
     grund: 30,
     klima: 16, // Klimageschwindigkeitsbonus: owner-occupiers replacing gas, oil or night storage heating
@@ -20,7 +22,7 @@ export const WP = {
   },
 };
 
-export const wpFreiePlaetze = WP.plaetze - WP.belegt;
+export const wpFreiePlaetze = WP.belegt === null ? null : WP.plaetze - WP.belegt;
 export const wpMaxFoerderung = Math.round((WP.foerderung.maxKosten * WP.foerderung.deckel) / 100);
 
 export const QUIZ = [

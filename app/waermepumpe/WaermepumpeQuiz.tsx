@@ -12,7 +12,6 @@ import {
   WP,
   berechneFoerderung,
   labelFor,
-  wpFreiePlaetze,
   type QuizAnswers,
   type QuizKey,
 } from "../lib/waermepumpe";
@@ -286,7 +285,7 @@ export default function WaermepumpeQuiz() {
           {loading ? "Wird gesendet …" : "Rückruf anfordern →"}
         </button>
         <span className={base.micro}>
-          🔒 0 € · unverbindlich · noch {wpFreiePlaetze} Plätze im {WP.monat}
+          🔒 0 € · unverbindlich · jederzeit Nein sagen
         </span>
         <button type="button" className={styles.back} onClick={() => goTo(total - 1)}>
           ← Antworten ändern

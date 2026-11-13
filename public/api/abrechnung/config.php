@@ -94,6 +94,23 @@ function format_bytes(int $bytes): string {
     return max(1, (int) round($bytes / 1024)) . ' KB';
 }
 
+/** Appends one consent record to UPLOAD_DIR/einwilligungen/YYYY-MM.jsonl. Returns false if it could not be written. */
+function log_consent(string $formular, array $entry): bool {
+    $dir = UPLOAD_DIR . '/einwilligungen';
+    if (!is_dir($dir) && !@mkdir($dir, 0750, true)) {
+        error_log('Consent log directory could not be created: ' . $dir);
+        return false;
+    }
+    $entry += [
+        'formular'   => $formular,
+        'ip'         => $_SERVER['REMOTE_ADDR'] ?? '',
+        'user_agent' => mb_substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 300),
+    ];
+    $ok = file_put_contents($dir . '/' . date('Y-m') . '.jsonl', json_encode($entry, JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND | LOCK_EX) !== false;
+    if (!$ok) error_log('Consent log could not be written to ' . $dir);
+    return $ok;
+}
+
 // Service-account access token for Google Sheets (used by lead.php and waermepumpe-lead.php)
 function google_access_token(array $creds): ?string {
     $now    = time();

@@ -24,8 +24,8 @@ const bricolage = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "Einsparprofis - Der 400€ Haushalts-Check | Strom, Gas & Versicherungen",
-  description: "Kostenloser Haushalts-Check für Strom, Gas & Sachversicherungen. Garantiert 400€ Ersparnis oder 20€ Gutschein. Keine versteckten Kosten – nur echte Ersparnisse.",
+  title: "Einsparprofis – Ø 400 € im Jahr sparen | Strom, Gas & Versicherungen",
+  description: "Kostenloser Haushalts-Check für Strom, Gas & Sachversicherungen: Ø 400 € Ersparnis im Jahr – oder 20-€-Gutschein. Wir vergleichen, kündigen und wechseln für Sie.",
   keywords: [
     "Strom sparen",
     "Gas sparen",
@@ -48,16 +48,16 @@ export const metadata: Metadata = {
     canonical: "https://einsparprofis.de",
   },
   openGraph: {
-    title: "Einsparprofis - Der 400€ Haushalts-Check",
-    description: "Kostenloser Haushalts-Check für Strom, Gas & Sachversicherungen. Garantiert 400€ Ersparnis oder 20€ Gutschein.",
+    title: "Einsparprofis – Ø 400 € im Jahr sparen",
+    description: "Kostenloser Haushalts-Check für Strom, Gas & Sachversicherungen: Ø 400 € Ersparnis im Jahr – oder 20-€-Gutschein.",
     url: "https://einsparprofis.de",
     siteName: "Einsparprofis",
     locale: "de_DE",
     type: "website",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Einsparprofis - Der 400€ Haushalts-Check",
+    card: "summary",
+    title: "Einsparprofis – Ø 400 € im Jahr sparen",
     description: "Kostenloser Haushalts-Check für Strom, Gas & Sachversicherungen.",
   },
   robots: {

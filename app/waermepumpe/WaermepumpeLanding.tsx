@@ -5,10 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import base from "../landing.module.css";
 import styles from "./waermepumpe.module.css";
 import WaermepumpeQuiz from "./WaermepumpeQuiz";
-import { ANGEBOT, eur } from "../lib/angebot";
+import { ANGEBOT, eur, waLink } from "../lib/angebot";
+import { WhatsappIcon } from "../components/HaushaltsLanding";
 import { WP, wpFreiePlaetze, wpMaxFoerderung } from "../lib/waermepumpe";
 
-const belegtPct = Math.round((WP.belegt / WP.plaetze) * 100);
 
 const steps = [
   { t: "Förder-Check", time: "Sie · 60 Sek.", d: "5 Fragen antippen, mögliche Förderung sofort sehen." },
@@ -35,6 +35,8 @@ const stack = [
   { n: "+", t: "Bonus: Preis-Wächter 1 Jahr", d: "Wir melden uns vor jeder Strompreiserhöhung.", v: "Wert 99 €", bonus: true },
 ];
 const gesamtwert = stack.reduce((sum, s) => sum + Number(s.v.replace(/\D/g, "")), 0);
+
+const WA_TEXT = "Hallo, ich interessiere mich für den kostenlosen Wärmepumpen-Check.";
 
 const faqs = [
   {
@@ -86,7 +88,7 @@ export default function WaermepumpeLanding() {
     <div className={base.page}>
       <div className={base.banner}>
         <span>
-          🔥 Nur {WP.plaetze} Wärmepumpen-Checks im {WP.monat}
+          🔥 Kostenlos · max. {WP.plaetze} Wärmepumpen-Checks pro Monat
         </span>
         {WP.klimabonusEnde && <span>⏳ Klimabonus sinkt voraussichtlich ab {WP.klimabonusEnde}</span>}
       </div>
@@ -265,12 +267,16 @@ export default function WaermepumpeLanding() {
             <div className={base.card} style={{ boxShadow: "inset 0 0 0 2px var(--line)" }}>
               <span className={base.eyebrow}>Warum ein Limit?</span>
               <h3>Nur {WP.plaetze} Wärmepumpen-Checks pro Monat – jeder wird persönlich betreut.</h3>
-              <div className={base.bar} role="img" aria-label={`${WP.belegt} von ${WP.plaetze} Plätzen vergeben`}>
-                <div style={{ width: `${belegtPct}%` }} />
-              </div>
-              <b style={{ display: "block", marginTop: 8, fontSize: 14 }}>
-                {WP.belegt} vergeben · noch {wpFreiePlaetze} frei im {WP.monat}
-              </b>
+              {WP.belegt !== null && (
+                <>
+                  <div className={base.bar} role="img" aria-label={`${WP.belegt} von ${WP.plaetze} Plätzen vergeben`}>
+                    <div style={{ width: `${Math.round((WP.belegt / WP.plaetze) * 100)}%` }} />
+                  </div>
+                  <b style={{ display: "block", marginTop: 8, fontSize: 14 }}>
+                    {WP.belegt} vergeben · noch {wpFreiePlaetze} frei im {WP.monat}
+                  </b>
+                </>
+              )}
             </div>
             {WP.klimabonusEnde ? (
               <div className={base.bonusCard}>
@@ -346,9 +352,10 @@ export default function WaermepumpeLanding() {
             <a href="#check" className={`${base.btn} ${styles.yellowBtn}`}>
               Förderung jetzt prüfen →
             </a>
-            <p style={{ fontSize: 13, color: "#d8d0e4", marginTop: 12 }}>
-              0 € · unverbindlich · noch {wpFreiePlaetze} Plätze im {WP.monat}
-            </p>
+            <a href={waLink(WA_TEXT)} target="_blank" rel="noopener" className={`${base.btn} ${base.btnWhatsapp}`} style={{ marginTop: 10 }}>
+              Oder per WhatsApp anfragen
+            </a>
+            <p style={{ fontSize: 13, color: "#d8d0e4", marginTop: 12 }}>0 € · unverbindlich · jederzeit Nein sagen</p>
           </div>
         </section>
       </main>
@@ -364,17 +371,19 @@ export default function WaermepumpeLanding() {
             <a href="/datenschutz.html" target="_blank">
               Datenschutz
             </a>
-            <a href="mailto:kontakt@einsparprofis.de">Kontakt</a>
+            <a href={`mailto:${ANGEBOT.email}`}>Kontakt</a>
           </nav>
         </div>
       </footer>
 
+      <a href={waLink(WA_TEXT)} target="_blank" rel="noopener" className={base.waFloat} aria-label="Per WhatsApp schreiben">
+        <WhatsappIcon />
+      </a>
+
       <div className={`${base.sticky} ${stickyVisible ? "" : base.hidden}`} aria-hidden={!stickyVisible}>
-        <span>
-          Bis {eur(wpMaxFoerderung)}
-          <br />
-          <em>Zuschuss · 0 €</em>
-        </span>
+        <a href={waLink(WA_TEXT)} target="_blank" rel="noopener" className={base.stickyWa} aria-label="Per WhatsApp schreiben" tabIndex={stickyVisible ? 0 : -1}>
+          <WhatsappIcon />
+        </a>
         <a href="#check" className={base.btn} tabIndex={stickyVisible ? 0 : -1}>
           Förderung prüfen →
         </a>
