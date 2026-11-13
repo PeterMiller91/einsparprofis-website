@@ -2,4 +2,4 @@
 :HL["/_next/static/media/9d5a263311222317-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 :HL["/_next/static/css/b65488d8300f61c5.css","style"]
 :HL["/_next/static/css/4ac17d89fa5e78f5.css","style"]
-0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"waermepumpe","param":null,"prefetchHints":4160,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"4WdUKudJ7K4XRi4uiLqAt"}
+0:{"tree":{"name":"","param":null,"prefetchHints":4112,"slots":{"children":{"name":"waermepumpe","param":null,"prefetchHints":4160,"slots":{"children":{"name":"__PAGE__","param":null,"prefetchHints":4256,"slots":null}}}}},"staleTime":300,"buildId":"Oi-s5-lYF1GNY7pGan6Tv"}
