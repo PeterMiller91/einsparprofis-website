@@ -94,9 +94,15 @@ export function berechneFoerderung(a: QuizAnswers) {
   return { prozent, euro: Math.round((f.maxKosten * prozent) / 100), teile };
 }
 
-// Consent texts are logged verbatim by public/api/waermepumpe-lead.php – keep both files in sync
-export const CONSENT_VERSION = "wp-2026-11b";
+// Consent texts are logged verbatim by public/api/waermepumpe-lead.php and
+// public/api/vor-ort-lead.php – keep the files in sync and raise the version on every change.
+// Data is NOT passed on from the website: a transfer to the installation partner only happens
+// after the customer explicitly agrees in the phone call.
+export const CONSENT_VERSION = "wp-2026-11c";
 export const CONSENT_TELEFON =
   "Ja, ich möchte, dass die Einsparprofis (Daniel Schultes) mich zu meinem Wärmepumpen-Check telefonisch und per WhatsApp unter der angegebenen Nummer kontaktieren. Diese Einwilligung kann ich jederzeit per E-Mail an kontakt@einsparprofis.de widerrufen.";
-export const CONSENT_WEITERGABE =
-  "Meine Angaben dürfen zur Erstellung eines Angebots an den Installationspartner der Einsparprofis weitergegeben werden.";
+
+// Door-to-door: filled in together with the customer on the advisor's phone
+export const VORORT_CONSENT_VERSION = "vo-2026-11a";
+export const VORORT_CONSENT =
+  "Ja, ich möchte, dass die Einsparprofis (Daniel Schultes) mich zu meinem Spar-Check telefonisch und per WhatsApp unter der angegebenen Nummer kontaktieren. Diese Einwilligung kann ich jederzeit per E-Mail an kontakt@einsparprofis.de widerrufen.";
