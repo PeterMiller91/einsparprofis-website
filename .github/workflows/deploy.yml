@@ -28,8 +28,15 @@ jobs:
       - name: Install
         run: npm ci
 
+      # Google Fonts antwortet gelegentlich fehlerhaft -> bis zu 3 Versuche
       - name: Build static export
-        run: npx next build --webpack
+        run: |
+          for i in 1 2 3; do
+            npx next build --webpack && exit 0
+            echo "Build fehlgeschlagen (Versuch $i), neuer Versuch in 20 s ..."
+            sleep 20
+          done
+          exit 1
 
       - name: Publish out/ to branch deploy
         uses: peaceiris/actions-gh-pages@v4
