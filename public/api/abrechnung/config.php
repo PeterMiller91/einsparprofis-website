@@ -1,5 +1,13 @@
 <?php
-// Load local config first (created on server, never in git)
+// Load local config first (created on server, never in git).
+// 1) <domain>/private/config.php – outside the web root, survives every deploy
+// 2) config.local.php next to this file (legacy)
+$privateConfig = !empty($_SERVER['DOCUMENT_ROOT'])
+    ? dirname(rtrim($_SERVER['DOCUMENT_ROOT'], '/')) . '/private/config.php'
+    : '';
+if ($privateConfig && is_file($privateConfig)) {
+    require_once $privateConfig;
+}
 $localConfig = __DIR__ . '/config.local.php';
 if (file_exists($localConfig)) {
     require_once $localConfig;
