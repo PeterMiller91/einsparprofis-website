@@ -3,10 +3,10 @@
 // Sends Telegram, appends to the Google Sheets tab "Waermepumpe" and logs the consent as proof.
 require_once __DIR__ . '/abrechnung/config.php';
 
-// Consent texts shown in app/lib/waermepumpe.ts – logged verbatim, keep both in sync
-const WP_CONSENT_VERSION   = 'wp-2026-11b';
+// Consent text shown in app/lib/waermepumpe.ts – logged verbatim, keep both in sync.
+// No transfer consent on the website: data is only passed on after explicit agreement in the phone call.
+const WP_CONSENT_VERSION   = 'wp-2026-11c';
 const WP_CONSENT_TELEFON   = 'Ja, ich möchte, dass die Einsparprofis (Daniel Schultes) mich zu meinem Wärmepumpen-Check telefonisch und per WhatsApp unter der angegebenen Nummer kontaktieren. Diese Einwilligung kann ich jederzeit per E-Mail an kontakt@einsparprofis.de widerrufen.';
-const WP_CONSENT_WEITERGABE = 'Meine Angaben dürfen zur Erstellung eines Angebots an den Installationspartner der Einsparprofis weitergegeben werden.';
 
 const WP_OPTIONS = [
     'heizung'   => ['gas' => 'Gas', 'oel' => 'Öl', 'nachtspeicher' => 'Nachtspeicher / Strom', 'andere' => 'Anderes'],
@@ -65,7 +65,6 @@ foreach (WP_OPTIONS as $key => $options) {
     $labels[$key] = $options[$value];
 }
 
-$weitergabe = ($body['consentWeitergabe'] ?? false) === true;
 $now        = new DateTimeImmutable('now', new DateTimeZone('Europe/Berlin'));
 $timestamp  = $now->format('d.m.Y H:i:s');
 $name       = "$vorname $nachname";
@@ -83,7 +82,7 @@ if (is_dir($consentDir) || @mkdir($consentDir, 0750, true)) {
         'quelle'     => $src,
         'version'    => WP_CONSENT_VERSION,
         'telefon_einwilligung' => WP_CONSENT_TELEFON,
-        'weitergabe_einwilligung' => $weitergabe ? WP_CONSENT_WEITERGABE : null,
+        'weitergabe_einwilligung' => null,
         'ip'         => $_SERVER['REMOTE_ADDR'] ?? '',
         'user_agent' => mb_substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 300),
     ];
@@ -107,7 +106,7 @@ if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
         . "🔑 " . $h($labels['eigentum']) . " · Einkommen " . $h($labels['einkommen']) . "\n"
         . "💶 <b>Mögliche Förderung:</b> " . $h($foerderung ?: '–') . "\n\n"
         . "✅ Telefon-Einwilligung erteilt (" . WP_CONSENT_VERSION . ")" . ($logged ? '' : ' ⚠️ Protokoll fehlgeschlagen') . "\n"
-        . ($weitergabe ? "✅ Weitergabe an Installationspartner erlaubt\n" : "⛔ Weitergabe an Installationspartner NICHT erlaubt – vorher fragen\n")
+        . "⛔ Weitergabe an Partner: nur nach Zustimmung im Gespräch\n"
         . "📊 <b>Quelle:</b> " . $h($src) . "\n"
         . "⏰ <b>Zeit:</b> " . $timestamp;
 
@@ -130,7 +129,7 @@ if (GOOGLE_SHEETS_ID && GOOGLE_SHEETS_CREDS) {
         $token = ($creds && isset($creds['client_email'], $creds['private_key'])) ? google_access_token($creds) : null;
         if ($token) {
             $row = [$timestamp, $name, $plz, $tel, $rueckruf, $labels['heizung'], $labels['haustyp'], $labels['baujahr'],
-                    $labels['eigentum'], $labels['einkommen'], $foerderung, 'ja', $weitergabe ? 'ja' : 'nein', WP_CONSENT_VERSION, $src];
+                    $labels['eigentum'], $labels['einkommen'], $foerderung, 'ja', 'im Gespräch', WP_CONSENT_VERSION, $src];
             $url = 'https://sheets.googleapis.com/v4/spreadsheets/' . GOOGLE_SHEETS_ID . '/values/' . urlencode('Waermepumpe!A:O') . ':append?valueInputOption=USER_ENTERED';
             $ch  = curl_init($url);
             curl_setopt_array($ch, [
